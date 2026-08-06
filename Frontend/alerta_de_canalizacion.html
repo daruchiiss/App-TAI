@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAI - Alerta de Canalización</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif; background-color: #EAE5DB; 
+            margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh;
+        }
+        #mockup-phone {
+            width: 375px; height: 812px; border: 14px solid #0D131A; border-radius: 45px;
+            overflow: hidden; display: flex; flex-direction: column; background-color: #FAF8F5;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25); position: relative; box-sizing: border-box;
+        }
+        #iphone-notch {
+            width: 140px; height: 28px; background-color: #0D131A;
+            border-bottom-left-radius: 18px; border-bottom-right-radius: 18px;
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%); z-index: 10;
+        }
+        
+        /* CABECERA CON FLECHA Y FOTO DE PERFIL */
+        header {
+            padding: 50px 20px 10px 20px; background-color: #FAF8F5;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        header .header-title { font-size: 15px; font-weight: 700; color: #1A3B68; margin-left: 10px; flex-grow: 1; }
+        header .back-btn { font-size: 14px; color: #1A3B68; cursor: pointer; }
+        header .doctor-avatar { width: 30px; height: 30px; border-radius: 50%; background-color: #CCC; background-image: url('https://via.placeholder.com/150'); background-size: cover; }
+
+        /* CONTENEDOR CON SCROLL */
+        .content-scroll { flex-grow: 1; overflow-y: auto; padding: 10px 16px 20px 16px; box-sizing: border-box; }
+        .content-scroll::-webkit-scrollbar { display: none; }
+
+        /* 1. TARJETA ALERTA DE ESTADO CRÍTICO */
+        .alert-status-card {
+            background-color: #FDF2F2; border-left: 4px solid #C0392B; border-radius: 14px;
+            padding: 12px 14px; display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+        }
+        .alert-icon-box {
+            width: 36px; height: 36px; background-color: #B05353; border-radius: 10px;
+            display: flex; justify-content: center; align-items: center; color: white; font-size: 16px;
+        }
+        .alert-title { font-size: 11px; font-weight: 700; color: #B05353; text-transform: uppercase; margin: 0; }
+        .alert-subtitle { font-size: 13px; font-weight: 700; color: #1A3B68; margin: 0; }
+
+        /* ESTILOS COMUNES PARA TARJETAS LIGERAS */
+        .light-card {
+            background-color: #FFFFFF; border-radius: 16px; padding: 14px 16px;
+            margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.015); border: 1px solid rgba(0,0,0,0.02);
+        }
+        .card-label { font-size: 9px; font-weight: 700; color: #8A857C; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.5px; }
+        .card-main-val { font-size: 15px; font-weight: 700; color: #1A3B68; margin-bottom: 8px; }
+
+        /* BADGES / ETIQUETAS PACIENTE */
+        .pills-info { display: flex; gap: 8px; margin-bottom: 12px; }
+        .info-badge { background-color: #F6F4EE; padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 600; color: #5D6D7E; }
+
+        /* SCORE DE CRISIS (BARRA DE PROGRESO) */
+        .crisis-progress-box { background-color: #F9F8F6; padding: 10px 12px; border-radius: 10px; }
+        .crisis-labels { display: flex; justify-content: space-between; font-size: 10px; font-weight: 700; margin-bottom: 6px; }
+        .crisis-text { color: #8A857C; }
+        .crisis-val { color: #B05353; }
+        .bar-bg { width: 100%; height: 6px; background-color: #E2DFD8; border-radius: 3px; overflow: hidden; }
+        .bar-fill { width: 92%; height: 100%; background-color: #B05353; border-radius: 3px; }
+
+        /* 2. DISPARADORES DETECTADOS (TRIGGERS) */
+        .section-title-icon { font-size: 12px; font-weight: 700; color: #1A3B68; display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+        .triggers-grid { display: flex; flex-direction: column; gap: 6px; }
+        .trigger-item {
+            padding: 8px 12px; border-radius: 10px; font-size: 11px; font-weight: 600;
+            display: inline-flex; align-items: center; gap: 6px; width: fit-content;
+        }
+        .trigger-critical { background-color: #FADBD8; color: #B05353; }
+        .trigger-medium { background-color: #F2E8E8; color: #A93226; }
+        .trigger-normal { background-color: #EAECEE; color: #5D6D7E; }
+
+        /* 3. CONTENEDOR PROTOCOLO DE EMERGENCIA (AZUL OSCURO) */
+        .dark-protocol-card {
+            background-color: #0A1C38; border-radius: 16px; padding: 16px; margin-bottom: 12px; color: white;
+        }
+        .protocol-header { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #85929E; margin-bottom: 12px; }
+        .btn-protocol {
+            width: 100%; border: none; border-radius: 12px; padding: 12px; font-size: 12px; font-weight: 600;
+            display: flex; justify-content: center; align-items: center; gap: 8px; cursor: pointer; margin-bottom: 8px;
+        }
+        .btn-accept { background-color: #FAF8F5; color: #1A3B68; }
+        .btn-history { background-color: #1B365D; color: #FFFFFF; }
+        .btn-emergency { background-color: #B05353; color: #FFFFFF; margin-bottom: 0; }
+
+        /* 4. GRAFICO DE EVOLUCIÓN DEL SENTIMIENTO */
+        .chart-box { display: flex; justify-content: space-between; align-items: flex-end; height: 75px; padding-top: 10px; }
+        .chart-bar { width: 16%; border-radius: 4px; }
+        .bar-pass { background-color: #E8F8F5; height: 50%; }
+        .bar-pass-2 { background-color: #E8F8F5; height: 45%; }
+        .bar-pass-3 { background-color: #E8F8F5; height: 55%; }
+        .bar-warn { background-color: #FCF3CF; height: 35%; }
+        .bar-warn-2 { background-color: #FADBD8; height: 25%; }
+        .bar-crit { background-color: #B05353; height: 90%; }
+        .chart-labels { display: flex; justify-content: space-between; font-size: 8px; color: #95A5A6; margin-top: 6px; font-weight: 600; }
+
+        /* 5. RESUMEN CONTEXTUAL DE IA */
+        .ia-card { background-color: #FAF8F5; border: 1px solid rgba(26, 59, 104, 0.08); }
+        .ia-text { font-size: 10.5px; color: #4A5568; line-height: 1.5; font-style: italic; margin: 0; }
+
+        /* 6. INFORMACIÓN DE SEGURIDAD */
+        .security-item { display: flex; align-items: flex-start; gap: 8px; margin-top: 8px; }
+        .sec-icon { font-size: 14px; margin-top: 1px; }
+        .sec-icon.green { color: #27AE60; }
+        .sec-icon.gold { color: #F39C12; }
+        .sec-title { font-size: 11px; font-weight: 700; color: #1A3B68; margin: 0; }
+        .sec-sub { font-size: 9px; color: #7F8C8D; margin: 0; }
+
+        /* BARRA INFERIOR */
+        .bottom-nav { background-color: #FFFFFF; border-top: 1px solid #EFECE3; padding: 10px 15px 25px 15px; display: flex; justify-content: space-around; align-items: center; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #95A5A6; font-size: 9px; font-weight: 500; text-decoration: none; }
+        .nav-item i { font-size: 15px; }
+        .nav-item.active { color: #A594F9; }
+    </style>
+</head>
+<body>
+
+    <div id="mockup-phone">
+        <div id="iphone-notch"></div>
+        
+        <header>
+            <i class="fas fa-arrow-left back-btn" onclick="history.back()"></i>
+            <span class="header-title">Alerta de Canalización</span>
+            <div class="doctor-avatar"></div>
+        </header>
+
+        <div class="content-scroll">
+            
+            <!-- 1. HEADER ESTADO CRÍTICO -->
+            <div class="alert-status-card">
+                <div class="alert-icon-box">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div>
+                    <p class="alert-title">¡ESTADO: CRÍTICO!</p>
+                    <p class="alert-subtitle">Intervención Requerida</p>
+                </div>
+            </div>
+
+            <!-- 2. IDENTIFICACIÓN Y DATO DEL INCIDENTE -->
+            <div class="light-card">
+                <p class="card-label">IDENTIFICACIÓN DEL PACIENTE</p>
+                <p class="card-main-val" id="paciente-id">USR-8821</p>
+                
+                <div class="pills-info">
+                    <span class="info-badge">Edad: 29 años</span>
+                    <span class="info-badge">Sesión: #12</span>
+                </div>
+
+                <p class="card-label" style="margin-top: 10px;">ÚLTIMO MARCADOR DE INCIDENTE</p>
+                <p style="font-size: 10.5px; color: #5D6D7E; margin: 2px 0 10px 0; line-height: 1.4;">
+                    Hoy, 10:42 AM – Detectado vía Procesamiento de Lenguaje Natural (PLN)
+                </p>
+
+                <div class="crisis-progress-box">
+                    <div class="crisis-labels">
+                        <span class="crisis-text">SCORE DE CRISIS (0.1)</span>
+                        <span class="crisis-val" id="score-val">92%</span>
+                    </div>
+                    <div class="bar-bg">
+                        <div class="bar-fill" id="score-bar"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. DISPARADORES DETECTADOS -->
+            <div class="light-card">
+                <div class="section-title-icon">
+                    <i class="fas fa-map-marker-alt" style="color: #B05353;"></i>
+                    Disparadores Detectados (Triggers)
+                </div>
+                <div class="triggers-grid">
+                    <div class="trigger-item trigger-critical">
+                        <i class="far fa-compass"></i> Desesperanza Aguda
+                    </div>
+                    <div class="trigger-item trigger-medium">
+                        <i class="fas fa-exclamation-triangle"></i> Riesgo Autolítico
+                    </div>
+                    <div class="trigger-item trigger-normal">
+                        Aislamiento Social
+                    </div>
+                    <div class="trigger-item trigger-normal">
+                        Ideación Persistente
+                    </div>
+                    <div class="trigger-item trigger-normal">
+                        Trastorno del Sueño
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. PROTOCOLO DE EMERGENCIA -->
+            <div class="dark-protocol-card">
+                <p class="protocol-header">PROTOCOLO DE EMERGENCIA</p>
+                <button class="btn-protocol btn-accept" onclick="aceptarCanalizacion()">
+                    <i class="fas fa-user-check"></i> Aceptar Canalización
+                </button>
+                <button class="btn-protocol btn-history" onclick="verHistorial()">
+                    <i class="fas fa-book-open"></i> Revisar Historial
+                </button>
+                <button class="btn-protocol btn-emergency" onclick="llamarEmergencias()">
+                    <i class="fas fa-phone-alt"></i> Llamar Emergencias
+                </button>
+            </div>
+
+            <!-- 5. EVOLUCIÓN DE SENTIMIENTO -->
+            <div class="light-card">
+                <p class="section-title-icon" style="margin-bottom: 4px;">Evolución de Sentimiento</p>
+                <div class="chart-box">
+                    <div class="chart-bar bar-pass"></div>
+                    <div class="chart-bar bar-pass-2"></div>
+                    <div class="chart-bar bar-pass-3"></div>
+                    <div class="chart-bar bar-warn"></div>
+                    <div class="chart-bar bar-warn-2"></div>
+                    <div class="chart-bar bar-crit"></div>
+                </div>
+                <div class="chart-labels">
+                    <span>Sesiones Anteriores</span>
+                    <span style="color: #B05353; font-weight: 700;">ACTUAL</span>
+                </div>
+            </div>
+
+            <!-- 6. RESUMEN CONTEXTUAL DE IA -->
+            <div class="light-card ia-card">
+                <div class="section-title-icon" style="color: #1A3B68; margin-bottom: 6px;">
+                    <i class="fas fa-sparkles" style="color: #1A3B68;"></i> Resumen Contextual de la IA
+                </div>
+                <p class="ia-text">
+                    "El paciente USR-8821 presenta un cambio abrupto en la prosodia y el contenido léxico durante los últimos 15 minutos de la sesión. Se detectó una repetición significativa de términos asociados con la autolesión y el cierre de asuntos pendientes. Se recomienda activación inmediata del protocolo de nivel 3 y contacto con el contacto de emergencia designado."
+                </p>
+            </div>
+
+            <!-- 7. INFORMACIÓN DE SEGURIDAD -->
+            <div class="light-card">
+                <p class="section-title-icon" style="margin-bottom: 8px;">Información de Seguridad</p>
+                
+                <div class="security-item">
+                    <i class="far fa-check-circle sec-icon green"></i>
+                    <div>
+                        <p class="sec-title">Protocolo Serene Activo</p>
+                        <p class="sec-sub">Validación biométrica completada para este recurso.</p>
+                    </div>
+                </div>
+
+                <div class="security-item">
+                    <i class="far fa-shield sec-icon gold"></i>
+                    <div>
+                        <p class="sec-title">Contacto de Red</p>
+                        <p class="sec-sub">Familiar registrado (María R.) ha sido notificado preventivamente.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- BARRA INFERIOR -->
+        <nav class="bottom-nav">
+            <a href="#" class="nav-item"><i class="fas fa-home"></i>Inicio</a>
+            <a href="#" class="nav-item active"><i class="far fa-calendar-alt"></i>Sesiones</a>
+            <a href="#" class="nav-item"><i class="fas fa-chart-line"></i>Progreso</a>
+            <a href="#" class="nav-item"><i class="far fa-user"></i>Perfil</a>
+        </nav>
+    </div>
+
+   <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const alertaId = urlParams.get('alerta_id');
+    const BACKEND_URL = "http://127.0.0.1:5000";
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (alertaId) {
+            fetch(`${BACKEND_URL}/profesional/alerta/${alertaId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exito && data.alerta) {
+                        const alerta = data.alerta;
+                        
+                        // Asignar ID de Paciente
+                        document.getElementById('paciente-id').innerText = alerta.usuario_id || 'USR-ANÓNIMO';
+                        
+                        // Asignar Nivel / Score
+                        if (alerta.nivel_severidad) {
+                            document.getElementById('score-val').innerText = `${alerta.nivel_severidad}%`;
+                            document.getElementById('score-bar').style.width = `${alerta.nivel_severidad}%`;
+                        }
+
+                        // Asignar Resumen IA
+                        if (alerta.resumen_ia) {
+                            document.querySelector('.ia-text').innerText = `"${alerta.resumen_ia}"`;
+                        }
+                    }
+                })
+                .catch(err => console.error("Error al cargar detalle de la alerta:", err));
+        }
+    });
+
+    function aceptarCanalizacion() {
+        if (!alertaId) {
+            alert("No hay una alerta válida seleccionada.");
+            return;
+        }
+
+        fetch(`${BACKEND_URL}/profesional/alertas/confirmar`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                alerta_id: parseInt(alertaId),
+                profesional_id: 'prof_001',
+                nuevo_estado: 'en_proceso'
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.exito || data.status === "ok") {
+                alert("✓ Caso aceptado. Te has asignado como profesional a cargo.");
+                window.location.href = "dashboard_profesional.html"; // Regresa al dashboard
+            } else {
+                alert("✗ " + (data.mensaje || "No se pudo confirmar la acción."));
+            }
+        })
+        .catch(err => alert("Error de red al confirmar la alerta."));
+    }
+
+    function verHistorial() {
+        const usuarioId = document.getElementById('paciente-id').innerText;
+        alert(`Cargando historial de la conversación del usuario: ${usuarioId}`);
+    }
+
+    function llamarEmergencias() {
+        if (confirm("¿Deseas conectar inmediatamente con la línea de emergencia 911 o 800-911-2000?")) {
+            window.location.href = "tel:911";
+        }
+    }
+</script>
+</body>
+</html>

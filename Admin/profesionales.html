@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAI Admin - Gestión de Profesionales</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #FAF8F5;
+            color: #1A3B68;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* SIDEBAR */
+        aside {
+            width: 250px;
+            background-color: #0A1C38;
+            color: #FFFFFF;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 24px 16px;
+            flex-shrink: 0;
+        }
+
+        .brand-box { margin-bottom: 30px; padding: 0 12px; }
+        .brand-box h1 { font-size: 20px; font-weight: 700; color: #FFFFFF; }
+        .brand-box p { font-size: 11px; color: #85929E; }
+
+        .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: #85929E;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .nav-item a:hover { background-color: rgba(255, 255, 255, 0.05); color: #FFFFFF; }
+        .nav-item.active a {
+            background-color: #1B365D;
+            color: #FFFFFF;
+            border-left: 4px solid #E74C3C;
+        }
+        .nav-item .material-symbols-outlined { font-size: 20px; }
+
+        .sidebar-bottom { border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+        .system-status {
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 11px;
+            color: #27AE60;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .status-dot { width: 8px; height: 8px; background-color: #27AE60; border-radius: 50%; }
+
+        /* ÁREA PRINCIPAL */
+        main { flex-grow: 1; display: flex; flex-direction: column; overflow-y: auto; }
+
+        /* HEADER */
+        header {
+            background-color: #FAF8F5;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #EFECE3;
+        }
+        .search-box {
+            background-color: #EFECE3;
+            border-radius: 20px;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 320px;
+        }
+        .search-box input { border: none; background: transparent; outline: none; font-size: 12px; width: 100%; color: #1A3B68; }
+        .header-actions { display: flex; align-items: center; gap: 16px; }
+        .admin-profile { display: flex; align-items: center; gap: 10px; }
+        .admin-avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; }
+
+        /* CONTENIDO */
+        .content { padding: 24px 32px; }
+
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .dashboard-header h2 { font-size: 20px; font-weight: 700; }
+        .dashboard-header p { font-size: 12px; color: #7F8C8D; }
+
+        .btn-invite {
+            background-color: #0A1C38;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* FILTROS */
+        .filters-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            background-color: #FFFFFF;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+        .filter-select {
+            background-color: #FAF8F5;
+            border: 1px solid #EFECE3;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 12px;
+            color: #1A3B68;
+            outline: none;
+        }
+
+        /* PANELD DE TABLA */
+        .panel-card {
+            background-color: #FFFFFF;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            border: 1px solid rgba(0,0,0,0.03);
+            margin-bottom: 24px;
+        }
+
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { font-size: 10px; font-weight: 700; color: #8A857C; text-transform: uppercase; padding: 12px 16px; border-bottom: 1px solid #EFECE3; }
+        td { font-size: 12px; padding: 14px 16px; border-bottom: 1px solid #FAF8F5; vertical-align: middle; }
+
+        .prof-cell { display: flex; align-items: center; gap: 12px; }
+        .prof-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+        .prof-name { font-weight: 700; margin: 0; }
+        .prof-id { font-size: 10px; color: #95A5A6; }
+
+        /* BADGES */
+        .badge { padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+        .badge-verified { background-color: #E8F8F5; color: #27AE60; }
+        .badge-pending { background-color: #FEF9E7; color: #F39C12; }
+        .badge-suspended { background-color: #FDEDEC; color: #E74C3C; }
+
+        /* BOTTOM METRICS */
+        .metrics-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .mini-card { background: #FFFFFF; padding: 16px; border-radius: 14px; border: 1px solid rgba(0,0,0,0.03); }
+        .mini-title { font-size: 10px; color: #8A857C; font-weight: 700; text-transform: uppercase; }
+        .mini-value { font-size: 22px; font-weight: 700; color: #1A3B68; margin-top: 4px; }
+
+        /* PAGINACIÓN */
+        .pagination { display: flex; justify-content: flex-end; gap: 6px; margin-top: 16px; }
+        .page-btn { padding: 6px 12px; border-radius: 6px; border: 1px solid #EFECE3; background: #FFF; font-size: 11px; cursor: pointer; }
+        .page-btn.active { background: #0A1C38; color: #FFF; border-color: #0A1C38; }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <aside>
+        <div>
+            <div class="brand-box">
+                <h1>TAI Admin</h1>
+                <p>Platform Controller</p>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#"><span class="material-symbols-outlined">dashboard</span> Dashboard</a>
+                </li>
+                <li class="nav-item active">
+                    <a href="#"><span class="material-symbols-outlined">clinical_notes</span> Professionals</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#"><span class="material-symbols-outlined">group</span> End-Users</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#"><span class="material-symbols-outlined">emergency</span> Emotional Alerts</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#"><span class="material-symbols-outlined">analytics</span> Appointments</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#"><span class="material-symbols-outlined">settings</span> System Settings</a>
+                </li>
+            </ul>
+        </div>
+        <div class="sidebar-bottom">
+            <div class="system-status"><div class="status-dot"></div> System Status: Stable</div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="#"><span class="material-symbols-outlined">logout</span> Log Out</a></li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main>
+        <header>
+            <div class="search-box">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" placeholder="Search by name, ID, or license...">
+            </div>
+            <div class="header-actions">
+                <div class="admin-profile">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100" class="admin-avatar">
+                </div>
+            </div>
+        </header>
+
+        <div class="content">
+            <div class="dashboard-header">
+                <div>
+                    <h2>Professional Management</h2>
+                    <p>Manage, verify, and monitor clinical staff activities and credentials.</p>
+                </div>
+                <button class="btn-invite"><span class="material-symbols-outlined" style="font-size:16px;">person_add</span> Invite Professional</button>
+            </div>
+
+            <!-- FILTROS -->
+            <div class="filters-bar">
+                <select class="filter-select">
+                    <option>All Specialties</option>
+                    <option>Psychologist</option>
+                    <option>Psychiatrist</option>
+                </select>
+                <select class="filter-select">
+                    <option>All Statuses</option>
+                    <option>Verified</option>
+                    <option>Pending</option>
+                    <option>Suspended</option>
+                </select>
+                <select class="filter-select">
+                    <option>Activity: All</option>
+                    <option>High</option>
+                    <option>Medium</option>
+                </select>
+            </div>
+
+            <!-- TABLA -->
+            <div class="panel-card">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name & Professional</th>
+                            <th>Specialty</th>
+                            <th>Verification</th>
+                            <th>Total Patients</th>
+                            <th>Rating</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="prof-cell">
+                                    <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=100" class="prof-avatar">
+                                    <div>
+                                        <p class="prof-name">Dr. Elena Rodriguez</p>
+                                        <span class="prof-id">ID: PSY-1029</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Psychologist</td>
+                            <td><span class="badge badge-verified"><span class="material-symbols-outlined" style="font-size:12px;">check_circle</span> Verified</span></td>
+                            <td>96</td>
+                            <td>⭐ 4.9</td>
+                            <td><span class="material-symbols-outlined" style="cursor:pointer; color:#8A857C;">more_horiz</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="prof-cell">
+                                    <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=100" class="prof-avatar">
+                                    <div>
+                                        <p class="prof-name">Marcus Thorne</p>
+                                        <span class="prof-id">ID: PSY-1044</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Psychologist</td>
+                            <td><span class="badge badge-pending"><span class="material-symbols-outlined" style="font-size:12px;">pending</span> Pending</span></td>
+                            <td>12</td>
+                            <td>--</td>
+                            <td><span class="material-symbols-outlined" style="cursor:pointer; color:#8A857C;">more_horiz</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="prof-cell">
+                                    <img src="https://images.unsplash.com/photo-1594824813566-88855ce78341?auto=format&fit=crop&q=80&w=100" class="prof-avatar">
+                                    <div>
+                                        <p class="prof-name">Sarah Jenkins</p>
+                                        <span class="prof-id">ID: PSY-0988</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Psychiatrist</td>
+                            <td><span class="badge badge-suspended"><span class="material-symbols-outlined" style="font-size:12px;">cancel</span> Suspended</span></td>
+                            <td>0</td>
+                            <td>⭐ 4.1</td>
+                            <td><span class="material-symbols-outlined" style="cursor:pointer; color:#8A857C;">more_horiz</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="pagination">
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                </div>
+            </div>
+
+            <!-- RESUMEN INFERIOR -->
+            <div class="metrics-row">
+                <div class="mini-card">
+                    <span class="mini-title">Active Staff</span>
+                    <div class="mini-value">112</div>
+                </div>
+                <div class="mini-card">
+                    <span class="mini-title">Pending Verification</span>
+                    <div class="mini-value" style="color:#F39C12;">12</div>
+                </div>
+                <div class="mini-card">
+                    <span class="mini-title">Avg. Match Score</span>
+                    <div class="mini-value" style="color:#27AE60;">92.4%</div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</body>
+</html>

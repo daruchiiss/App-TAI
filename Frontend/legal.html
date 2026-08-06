@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAI - Información Legal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #EAE5DB; 
+            margin: 0; padding: 0;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+        }
+        #mockup-phone {
+            width: 375px; height: 812px; 
+            border: 14px solid #0D131A; border-radius: 45px;
+            overflow: hidden; display: flex; flex-direction: column;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25); position: relative;
+            background-color: #F7F5F0; padding: 60px 24px 30px 24px; box-sizing: border-box;
+        }
+        #iphone-notch {
+            width: 140px; height: 28px; background-color: #0D131A;
+            border-bottom-left-radius: 18px; border-bottom-right-radius: 18px;
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%); z-index: 10;
+        }
+        .container {
+            display: flex; flex-direction: column; width: 100%; height: 100%; overflow-y: auto;
+        }
+        .legal-header { display: flex; align-items: center; width: 100%; gap: 16px; margin-bottom: 20px; }
+        .btn-back {
+            width: 32px; height: 32px; border-radius: 50%; border: 1px solid #E2E8F0;
+            background: white; display: flex; justify-content: center; align-items: center; cursor: pointer; color: #1A3B68;
+        }
+        .legal-header h2 { font-size: 16px; font-weight: 600; color: #1A3B68; margin: 0; }
+        .legal-title { font-size: 22px; font-weight: 700; color: #1A3B68; margin: 0 0 12px 0; }
+        .legal-intro { font-size: 12px; color: #506173; line-height: 1.5; margin-bottom: 15px; }
+        .badge-version {
+            background-color: #E6F4F0; color: #2E7D6B; font-size: 11px; padding: 6px 12px;
+            border-radius: 12px; align-self: flex-start; margin-bottom: 20px; font-weight: 500;
+        }
+        .card-legal {
+            background: white; border-radius: 18px; padding: 16px; margin-bottom: 15px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02); border: 1px solid #F0ECE3;
+        }
+        .card-legal h3 { font-size: 14px; font-weight: 700; color: #1A3B68; margin: 0 0 8px 0; }
+        .card-legal p { font-size: 12px; color: #506173; line-height: 1.5; margin: 0 0 10px 0; }
+        .card-legal ul { margin: 0; padding-left: 18px; font-size: 12px; color: #506173; }
+        .card-legal li { margin-bottom: 4px; }
+        .checkbox-container { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; font-size: 12px; color: #2C3E50; cursor: pointer; }
+        .checkbox-container input { margin-top: 3px; }
+        .checkbox-container strong { color: #1A3B68; }
+        .btn-primary {
+            width: 100%; background-color: #1A3B68; color: #FFFFFF;
+            border: none; border-radius: 20px; padding: 14px;
+            font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer;
+            margin-top: 15px; box-shadow: 0 4px 12px rgba(26, 59, 104, 0.2);
+        }
+        .btn-primary:disabled { background-color: #A0B0C5; cursor: not-allowed; box-shadow: none; }
+        .download-link { font-size: 12px; text-decoration: underline; color: #6A7B8C; text-align: center; margin-top: 15px; display: block; }
+        @media (max-width: 420px) {
+            #mockup-phone { border: none; border-radius: 0; width: 100vw; height: 100vh; padding-top: 40px; }
+            #iphone-notch { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="mockup-phone">
+        <div id="iphone-notch"></div>
+        
+        <div class="container">
+            <div class="legal-header">
+                <button class="btn-back" onclick="window.location.href='login.html'"><i class="fas fa-arrow-left"></i></button>
+                <h2>Información Legal</h2>
+            </div>
+
+            <h1 class="legal-title">Términos y Privacidad</h1>
+            <p class="legal-intro">En TAI, entendemos que tu salud mental es lo más importante. Tu privacidad y bienestar no son una obligación legal, son un compromiso ético fundamental para crear un espacio seguro y terapéutico.</p>
+            
+            <div class="badge-version"><i class="fas fa-circle" style="font-size: 6px; vertical-align: middle; margin-right: 5px;"></i> Documento oficial TAI 2026-V1</div>
+
+            <div class="card-legal">
+                <h3>1. Uso de Datos</h3>
+                <p>La información que registras se usa con el único propósito de mejorar tu proceso de acompañamiento terapéutico. Tus registros están protegidos mediante modelos de encriptación de extremo a extremo.</p>
+                <ul>
+                    <li>Datos de registro (nombre, edad, contacto)</li>
+                    <li>Registros de sesiones y bitácoras</li>
+                    <li>Patrones de interacción emocional</li>
+                </ul>
+            </div>
+
+            <div class="card-legal">
+                <h3>2. Confidencialidad</h3>
+                <p>Ningún dato clínico se comparte con terceros sin tu consentimiento explícito, salvo obligación legal en casos de riesgo grave.</p>
+            </div>
+
+            <label class="checkbox-container">
+                <input type="checkbox" id="chk-terminos" onchange="validar()">
+                <span>Acepto los <strong>Términos y Condiciones</strong></span>
+            </label>
+
+            <label class="checkbox-container">
+                <input type="checkbox" id="chk-privacidad" onchange="validar()">
+                <span>Acepto la <strong>Política de Privacidad</strong> y manejo de datos clínicos</span>
+            </label>
+
+            <button id="btn-continuar" class="btn-primary" disabled onclick="window.location.href='personalizacion.html'">Aceptar y Continuar</button>
+            <a href="#" class="download-link"><i class="fas fa-download"></i> Descargar copia</a>
+        </div>
+    </div>
+
+    <script>
+        function validar() {
+            const t = document.getElementById("chk-terminos").checked;
+            const p = document.getElementById("chk-privacidad").checked;
+            document.getElementById("btn-continuar").disabled = !(t && p);
+        }
+    </script>
+</body>
+</html>

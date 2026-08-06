@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAI - Crear Cuenta</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif; background-color: #EAE5DB; 
+            margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh;
+        }
+        #mockup-phone {
+            width: 375px; height: 812px; border: 14px solid #0D131A; border-radius: 45px;
+            overflow: hidden; display: flex; flex-direction: column; background-color: #FAF8F5;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25); position: relative; box-sizing: border-box;
+        }
+        #iphone-notch {
+            width: 140px; height: 28px; background-color: #0D131A;
+            border-bottom-left-radius: 18px; border-bottom-right-radius: 18px;
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%); z-index: 10;
+        }
+        
+        /* CABECERA (Acorde a tu imagen) */
+        header {
+            padding: 50px 20px 10px 20px; display: flex; align-items: center; justify-content: space-between;
+            background-color: #FAF8F5; border-bottom: 1px solid rgba(0,0,0,0.03);
+        }
+        header .back-btn { font-size: 16px; color: #1A3B68; cursor: pointer; }
+        header .nav-title { font-size: 16px; font-weight: 700; color: #1A3B68; margin-right: auto; margin-left: 15px; }
+        header .profile-avatar { width: 32px; height: 32px; border-radius: 50%; background-color: #DDD; background-image: url('https://via.placeholder.com/150'); background-size: cover; }
+
+        /* CONTENEDOR SCROLLABLE */
+        .content-scroll { flex-grow: 1; overflow-y: auto; padding: 15px 20px; box-sizing: border-box; }
+        .content-scroll::-webkit-scrollbar { display: none; }
+
+        /* INDICADOR DE PASOS */
+        .steps-container { display: flex; justify-content: center; align-items: center; gap: 10px; margin: 10px 0 25px 0; }
+        .step-circle { width: 26px; height: 26px; border-radius: 50%; background-color: #EFECE3; color: #7F8C8D; font-size: 12px; font-weight: 600; display: flex; justify-content: center; align-items: center; }
+        .step-circle.active { background-color: #1A3B68; color: white; }
+        .step-line { width: 45px; height: 3px; background-color: #EFECE3; border-radius: 2px; }
+        .step-line.active { background-color: #1A3B68; }
+
+        /* TEXTOS PRINCIPALES */
+        .main-title { font-size: 19px; font-weight: 700; color: #1A3B68; text-align: center; margin: 0 0 6px 0; }
+        .main-subtitle { font-size: 11px; color: #7F8C8D; text-align: center; line-height: 1.4; padding: 0 10px; margin-bottom: 25px; }
+
+        /* TARJETAS DE FORMULARIO (Cards blancas con sombras suaves) */
+        .form-card { background-color: #FFFFFF; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.015); margin-bottom: 15px; border: 1px solid rgba(26, 59, 104, 0.04); }
+        .card-header { font-size: 13px; font-weight: 600; color: #1A3B68; display: flex; align-items: center; gap: 8px; margin-bottom: 18px; }
+        .card-header.emergency { color: #C0392B; }
+
+        /* ENTRADAS DE TEXTO / INPUTS */
+        .input-group { margin-bottom: 14px; position: relative; }
+        .input-group label { display: block; font-size: 11px; font-weight: 600; color: #1A3B68; margin-bottom: 6px; }
+        .input-field { width: 100%; background-color: #F6F4EE; border: none; border-radius: 10px; padding: 12px 14px; font-size: 12px; color: #2C3E50; outline: none; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        .input-field::placeholder { color: #B2BABB; font-weight: 300; }
+        .password-toggle { position: absolute; right: 14px; bottom: 12px; color: #7F8C8D; cursor: pointer; font-size: 13px; }
+
+        /* CHECKBOX CONSENTIMIENTO */
+        .consent-wrapper { display: flex; gap: 10px; align-items: flex-start; margin: 20px 5px; }
+        .consent-checkbox { width: 16px; height: 16px; margin-top: 2px; cursor: pointer; }
+        .consent-text { font-size: 10px; color: #5D6D7E; line-height: 1.4; }
+        .consent-text strong { color: #1A3B68; }
+
+        /* BOTONES DE ACCIÓN */
+        .btn-primary { width: 100%; background-color: #1A3B68; color: white; border: none; border-radius: 12px; padding: 14px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(26, 59, 104, 0.2); margin-top: 10px; }
+        .btn-primary:hover { background-color: #24487A; }
+        
+        .login-link-text { text-align: center; font-size: 11px; color: #7F8C8D; margin-top: 20px; margin-bottom: 10px; }
+        .login-link-text a { color: #1A3B68; font-weight: 600; text-decoration: none; }
+
+        /* BARRA DE NAVEGACIÓN INFERIOR DE TU MOCKUP */
+        .bottom-nav { background-color: #FFFFFF; border-top: 1px solid #EFECE3; padding: 10px 15px 25px 15px; display: flex; justify-content: space-around; align-items: center; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #95A5A6; cursor: pointer; font-size: 9px; font-weight: 500; text-decoration: none; }
+        .nav-item i { font-size: 15px; }
+        .nav-item.active { color: #A594F9; } /* Color morado suave del botón seleccionado en tu mockup */
+    </style>
+</head>
+<body>
+
+    <div id="mockup-phone">
+        <div id="iphone-notch"></div>
+        
+        <header>
+            <i class="fas fa-arrow-left back-btn" onclick="window.location.href='login.html'"></i>
+            <span class="nav-title">TAI</span>
+            <div class="profile-avatar"></div>
+        </header>
+
+        <div class="content-scroll">
+            <!-- Barra de progreso dinámica -->
+            <div class="steps-container">
+                <div class="step-circle active" id="circle-1">1</div>
+                <div class="step-line" id="line-1"></div>
+                <div class="step-circle" id="circle-2">2</div>
+                <div class="step-line" id="line-2"></div>
+                <div class="step-circle" id="circle-3">3</div>
+            </div>
+
+            <h2 class="main-title">Crear tu cuenta clínica</h2>
+            <p class="main-subtitle">Únete a nuestra plataforma de apoyo profesional con los más altos estándares de seguridad y confidencialidad.</p>
+
+            <form id="registro-form">
+                
+                <!-- PASO 1: INFORMACIÓN PERSONAL -->
+                <div id="paso-1-container">
+                    <div class="form-card">
+                        <div class="card-header">
+                            <i class="far fa-user"></i> Información Personal
+                        </div>
+                        <div class="input-group">
+                            <label>Nombre completo</label>
+                            <input type="text" id="nombre" class="input-field" placeholder="Escribe tu nombre" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Correo electrónico</label>
+                            <input type="email" id="email" class="input-field" placeholder="ejemplo@tai.com" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Edad</label>
+                            <input type="number" id="edad" class="input-field" placeholder="00" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Contraseña</label>
+                            <input type="password" id="password" class="input-field" placeholder="Mínimo 8 caracteres" required>
+                            <i class="far fa-eye password-toggle" onclick="togglePasswordView()"></i>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="btn-primary" onclick="irAlPaso(2)">Siguiente paso <i class="fas fa-arrow-right"></i></button>
+                </div>
+
+                <!-- PASO 2: CONTACTO DE EMERGENCIA (Oculto al inicio) -->
+                <div id="paso-2-container" style="display: none;">
+                    <div class="form-card">
+                        <div class="card-header emergency">
+                            <i class="fas fa-asterisk"></i> Contacto de Emergencia
+                        </div>
+                        <div class="input-group">
+                            <label>Nombre de confianza</label>
+                            <input type="text" id="contacto_emergencia_nombre" class="input-field" placeholder="Ej: Madre, Pareja, Amigo">
+                        </div>
+                        <div class="input-group">
+                            <label>Teléfono de emergencia</label>
+                            <input type="tel" id="contacto_emergencia_telefono" class="input-field" placeholder="+00 000 000 000">
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn-primary" onclick="irAlPaso(3)">Siguiente paso <i class="fas fa-arrow-right"></i></button>
+                </div>
+
+                <!-- PASO 3: TUTOR Y CONSENTIMIENTO (Oculto al inicio) -->
+                <div id="paso-3-container" style="display: none;">
+                    <div class="form-card">
+                        <div class="card-header">
+                            <i class="fas fa-user-shield"></i> Datos del Tutor (Menores de edad)
+                        </div>
+                        <div class="input-group">
+                            <label>Nombre del tutor</label>
+                            <input type="text" id="tutor_nombre" class="input-field" placeholder="Opcional si eres mayor de edad">
+                        </div>
+                        <div class="input-group">
+                            <label>Contacto del tutor</label>
+                            <input type="text" id="tutor_contacto" class="input-field" placeholder="Teléfono o correo">
+                        </div>
+                    </div>
+
+                    <div class="consent-wrapper">
+                        <input type="checkbox" id="consentimiento_aceptado" class="consent-checkbox" required>
+                        <div class="consent-text">
+                            Acepto el <strong>consentimiento informado</strong> y los <strong>términos de uso</strong>. Entiendo que TAI es una herramienta de apoyo y no sustituye la atención médica de urgencia.
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Completar registro <i class="fas fa-arrow-right"></i></button>
+                </div>
+
+            </form>
+
+            <p class="login-link-text">¿Ya tienes una cuenta? <a href="login.html">Inicia sesión</a></p>
+        </div>
+
+        <!-- BARRA INFERIOR -->
+        <nav class="bottom-nav">
+            <a href="#" class="nav-item"><i class="fas fa-home"></i>Inicio</a>
+            <a href="#" class="nav-item"><i class="far fa-calendar-alt"></i>Sesiones</a>
+            <a href="#" class="nav-item"><i class="fas fa-chart-line"></i>Progreso</a>
+            <a href="#" class="nav-item active"><i class="far fa-user"></i>Perfil</a>
+        </nav>
+    </div>
+
+    <script>
+    // 1. Configuración de conexión
+    // ⚠️ Si usas Ngrok, cambia esta variable por tu URL de Ngrok (ej: "https://xxxx.ngrok-free.dev")
+    const BASE_URL = "http://127.0.0.1:5000";
+
+    // 2. Transición entre pasos del formulario
+    function irAlPaso(pasoDestino) {
+        // Validar Paso 1 antes de avanzar
+        if (pasoDestino === 2) {
+            const nombre = document.getElementById("nombre").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const edad = document.getElementById("edad").value.trim();
+            const password = document.getElementById("password").value;
+
+            if (!nombre || !email || !edad || !password) {
+                alert("Por favor completa todos los campos del Paso 1.");
+                return;
+            }
+        }
+
+        // Ocultar contenedores
+        const paso1 = document.getElementById("paso-1-container");
+        const paso2 = document.getElementById("paso-2-container");
+        const paso3 = document.getElementById("paso-3-container");
+
+        if (paso1) paso1.style.display = "none";
+        if (paso2) paso2.style.display = "none";
+        if (paso3) paso3.style.display = "none";
+
+        // Mostrar el paso correspondiente
+        const pasoActual = document.getElementById(`paso-${pasoDestino}-container`);
+        if (pasoActual) pasoActual.style.display = "block";
+
+        // Actualizar la línea de progreso e indicadores visuales
+        const circle2 = document.getElementById("circle-2");
+        const line1 = document.getElementById("line-1");
+        const circle3 = document.getElementById("circle-3");
+        const line2 = document.getElementById("line-2");
+
+        if (pasoDestino >= 2) {
+            if (circle2) circle2.classList.add("active");
+            if (line1) line1.classList.add("active");
+        } else {
+            if (circle2) circle2.classList.remove("active");
+            if (line1) line1.classList.remove("active");
+        }
+
+        if (pasoDestino === 3) {
+            if (circle3) circle3.classList.add("active");
+            if (line2) line2.classList.add("active");
+        } else {
+            if (circle3) circle3.classList.remove("active");
+            if (line2) line2.classList.remove("active");
+        }
+    }
+
+    // 3. Mostrar / ocultar contraseña
+    function togglePasswordView() {
+        const passwordField = document.getElementById("password");
+        const icon = document.querySelector(".password-toggle");
+        if (!passwordField) return;
+
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+            if (icon) icon.classList.replace("fa-eye", "fa-eye-slash");
+        } else {
+            passwordField.type = "password";
+            if (icon) icon.classList.replace("fa-eye-slash", "fa-eye");
+        }
+    }
+
+    // 4. Envío del formulario de registro
+    document.getElementById("registro-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const consentimiento = document.getElementById("consentimiento_aceptado");
+        if (consentimiento && !consentimiento.checked) {
+            alert("Debes aceptar el consentimiento informado para continuar.");
+            return;
+        }
+
+        // Construir JSON mapeado para app.py
+        const payload = {
+            nombre: document.getElementById("nombre").value.trim(),
+            email: document.getElementById("email").value.trim(),
+            password: document.getElementById("password").value,
+            edad: parseInt(document.getElementById("edad").value, 10),
+            tutor_nombre: document.getElementById("tutor_nombre")?.value.trim() || null,
+            tutor_contacto: document.getElementById("tutor_contacto")?.value.trim() || null,
+            contacto_emergencia_nombre: document.getElementById("contacto_emergencia_nombre")?.value.trim() || null,
+            contacto_emergencia_telefono: document.getElementById("contacto_emergencia_telefono")?.value.trim() || null,
+            consentimiento_aceptado: consentimiento ? consentimiento.checked : false
+        };
+
+        try {
+            const response = await fetch(`${BASE_URL}/registro`, {
+                method: "POST",
+                headers: { 
+                    "Content-Type": "application/json",
+                    "ngrok-skip-browser-warning": "true"
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+
+            if (response.ok && (data.exito || data.success)) {
+                if (data.usuario_id) {
+                    localStorage.setItem("usuario_id", data.usuario_id);
+                }
+                alert("¡Registro exitoso! Antes de continuar, revisa y acepta los términos.");
+                window.location.href = "legal.html";
+            } else {
+                alert("Error al registrar: " + (data.mensaje || data.error || "Datos incorrectos."));
+            }
+        } catch (error) {
+            console.error("Error crítico de red:", error);
+            alert("Error crítico al intentar conectar con el servidor TAI.");
+        }
+    });
+</script>
+</body>
+</html>

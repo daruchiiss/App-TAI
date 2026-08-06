@@ -1,0 +1,344 @@
+/* ==========================================================================
+   1. RESET & VARIABLES GLOBALES
+   ========================================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary: #5B5EA6;
+    --secondary: #1A8917;
+    --danger: #E74C3C;
+    --warning: #F39C12;
+    --info: #3498DB;
+    --dark: #2C3E50;
+    --light: #ECF0F1;
+    --border: #BDC3C7;
+    --text-primary: #2C3E50;
+    --text-secondary: #7F8C8D;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f5f5;
+    color: var(--text-primary);
+    min-height: 100vh;
+}
+
+/* ==========================================================================
+   2. ESTRUCTURA DEL DASHBOARD
+   ========================================================================== */
+.dashboard-container {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    background: linear-gradient(135deg, var(--primary) 0%, #4a4d95 100%);
+    color: white;
+    padding: 20px;
+    overflow-y: auto;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar .logo {
+    margin-bottom: 30px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 20px;
+}
+
+.sidebar .logo h1 {
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.nav-menu {
+    list-style: none;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    margin: 8px 0;
+    border-radius: 8px;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.nav-item:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateX(5px);
+}
+
+.nav-item.active {
+    background: rgba(255, 255, 255, 0.25);
+    border-left: 4px solid white;
+    padding-left: 11px;
+}
+
+.nav-item .icon {
+    margin-right: 12px;
+    font-size: 18px;
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Header */
+.header {
+    background: white;
+    padding: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.header h2 {
+    font-size: 28px;
+    color: var(--text-primary);
+}
+
+.header-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    color: var(--text-secondary);
+}
+
+.admin-user {
+    background: var(--light);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Content Area */
+.content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 30px;
+}
+
+/* ==========================================================================
+   3. COMPONENTES DEL DASHBOARD (KPIs, Tablas, Gráficas, Alertas)
+   ========================================================================== */
+/* KPI Section */
+.kpi-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.kpi-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.kpi-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.kpi-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+}
+
+.kpi-icon.users { background: #E8F4F8; color: var(--info); }
+.kpi-icon.conversations { background: #F0E8F8; color: var(--primary); }
+.kpi-icon.derivations { background: #F8E8E8; color: var(--warning); }
+.kpi-icon.professionals { background: #E8F8E8; color: var(--secondary); }
+
+.kpi-content {
+    flex: 1;
+}
+
+.kpi-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.kpi-value {
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.kpi-change {
+    font-size: 12px;
+    color: var(--secondary);
+    margin-top: 5px;
+}
+
+/* Charts Section */
+.charts-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.chart-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.chart-card h3 {
+    margin-bottom: 20px;
+    color: var(--text-primary);
+    font-size: 16px;
+}
+
+.chart-card canvas {
+    max-height: 300px;
+}
+
+/* Activity Section */
+.activity-section {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-bottom: 40px;
+}
+
+.activity-section h3 {
+    margin-bottom: 20px;
+    color: var(--text-primary);
+}
+
+.activity-table {
+    overflow-x: auto;
+}
+
+.activity-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.activity-table thead {
+    background: var(--light);
+}
+
+.activity-table th {
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--border);
+}
+
+.activity-table td {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-secondary);
+}
+
+.activity-table tr:hover {
+    background: #f9f9f9;
+}
+
+/* Alerts Section */
+.alerts-section {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.alerts-section h3 {
+    margin-bottom: 15px;
+    color: var(--text-primary);
+}
+
+.alert {
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-left: 4px solid;
+}
+
+.alert-success { background: #D4EDDA; border-color: var(--secondary); color: #155724; }
+.alert-warning { background: #FFF3CD; border-color: var(--warning); color: #856404; }
+.alert-danger { background: #F8D7DA; border-color: var(--danger); color: #721C24; }
+
+/* Scrollbar Personalizado */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #555; }
+
+/* ==========================================================================
+   4. SECCIÓN ESPECÍFICA PARA EL LOGIN (Evita romper el body global)
+   ========================================================================== */
+.login-page-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f6f9;
+}
+
+.login-container {
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    width: 100%;
+    max-width: 380px;
+    text-align: center;
+}
+
+/* ==========================================================================
+   5. RESPONSIVE / MEDIA QUERIES
+   ========================================================================== */
+@media (max-width: 1024px) {
+    .sidebar { width: 200px; }
+    .kpi-section { grid-template-columns: repeat(2, 1fr); }
+    .charts-section { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+    .dashboard-container { flex-direction: column; }
+    .sidebar { width: 100%; height: auto; padding: 15px; }
+    .nav-menu { display: flex; gap: 10px; flex-wrap: wrap; }
+    .kpi-section { grid-template-columns: 1fr; }
+    .header { flex-direction: column; gap: 15px; align-items: flex-start; }
+    .header-info { flex-direction: column; gap: 10px; }
+}

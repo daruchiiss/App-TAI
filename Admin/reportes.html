@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAI Admin - Monitoreo de Alertas Emocionales</title>
+    <!-- Google Fonts & Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #FAF8F5;
+            color: #1A3B68;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ---------------- BARRA LATERAL (SIDEBAR) ---------------- */
+        aside {
+            width: 250px;
+            background-color: #0A1C38;
+            color: #FFFFFF;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 24px 16px;
+            flex-shrink: 0;
+        }
+
+        .brand-box { margin-bottom: 30px; padding: 0 12px; }
+        .brand-box h1 { font-size: 20px; font-weight: 700; color: #FFFFFF; }
+        .brand-box p { font-size: 11px; color: #85929E; }
+
+        .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: #85929E;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .nav-item a:hover { background-color: rgba(255, 255, 255, 0.05); color: #FFFFFF; }
+        .nav-item.active a {
+            background-color: #1B365D;
+            color: #FFFFFF;
+            border-left: 4px solid #E74C3C;
+        }
+        .nav-item .material-symbols-outlined { font-size: 20px; }
+
+        .sidebar-bottom { border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+        .system-status {
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 11px;
+            color: #27AE60;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .status-dot { width: 8px; height: 8px; background-color: #27AE60; border-radius: 50%; }
+
+        /* ---------------- ÁREA PRINCIPAL ---------------- */
+        main { flex-grow: 1; display: flex; flex-direction: column; overflow-y: auto; }
+
+        header {
+            background-color: #FAF8F5;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #EFECE3;
+        }
+        .search-box {
+            background-color: #EFECE3;
+            border-radius: 20px;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 320px;
+        }
+        .search-box input { border: none; background: transparent; outline: none; font-size: 12px; width: 100%; color: #1A3B68; }
+        .admin-avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; }
+
+        .content { padding: 24px 32px; }
+
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .dashboard-header h2 { font-size: 20px; font-weight: 700; }
+        .dashboard-header p { font-size: 12px; color: #7F8C8D; }
+
+        /* DISPOSICIÓN PRINCIPAL (GRID 2 COLUMNAS) */
+        .alerts-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        /* TARJETAS DE ALERTAS INDIVIDUALES */
+        .alert-card {
+            background-color: #FFFFFF;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            border: 1px solid #FADBD8;
+            border-left: 5px solid #C0392B;
+        }
+
+        .alert-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .alert-user-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .alert-time-tag {
+            font-size: 11px;
+            color: #7F8C8D;
+        }
+
+        .assigned-prof {
+            font-size: 11px;
+            color: #1A3B68;
+            background-color: #FAF8F5;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        /* METRICAS INTERNAS DE LA ALERTA */
+        .alert-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            background-color: #FAF8F5;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+        }
+        .metric-mini-box { font-size: 11px; }
+        .metric-mini-label { font-size: 10px; color: #8A857C; font-weight: 700; text-transform: uppercase; }
+        .metric-mini-value { font-weight: 700; color: #C0392B; margin-top: 2px; }
+
+        /* BOTONES DE ACCIÓN RÁPIDA */
+        .alert-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .btn-emergency {
+            background-color: #0A1C38;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-escalate {
+            background-color: #EFECE3;
+            color: #1A3B68;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* COLUMNA DERECHA (ESTADÍSTICAS E IA) */
+        .side-panel { display: flex; flex-direction: column; gap: 16px; }
+
+        .panel-card {
+            background-color: #FFFFFF;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+        .ai-card {
+            background-color: #0A1C38;
+            color: #FFFFFF;
+            border-radius: 16px;
+            padding: 20px;
+        }
+        .ai-card-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.8; }
+        .ai-card-value { font-size: 32px; font-weight: 700; margin: 8px 0; }
+        .ai-card-sub { font-size: 11px; opacity: 0.7; line-height: 1.4; }
+
+        /* LISTA DE RESPUESTA INTERNA */
+        .team-list { list-style: none; margin-top: 10px; display: flex; flex-direction: column; gap: 10px; }
+        .team-item { display: flex; align-items: center; justify-content: space-between; font-size: 12px; }
+        .team-status { width: 8px; height: 8px; border-radius: 50%; background-color: #27AE60; }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <aside>
+        <div>
+            <div class="brand-box">
+                <h1>TAI Admin</h1>
+                <p>Platform Controller</p>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="admin_dashboard.html"><span class="material-symbols-outlined">dashboard</span> Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a href="admin_professionals.html"><span class="material-symbols-outlined">clinical_notes</span> Professionals</a>
+                </li>
+                <li class="nav-item">
+                    <a href="admin_users.html"><span class="material-symbols-outlined">group</span> End-Users</a>
+                </li>
+                <li class="nav-item active">
+                    <a href="#"><span class="material-symbols-outlined">emergency</span> Emotional Alerts</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#"><span class="material-symbols-outlined">analytics</span> Appointments</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#"><span class="material-symbols-outlined">settings</span> System Settings</a>
+                </li>
+            </ul>
+        </div>
+        <div class="sidebar-bottom">
+            <div class="system-status"><div class="status-dot"></div> System Status: Stable</div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="admin_login.html"><span class="material-symbols-outlined">logout</span> Log Out</a></li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main>
+        <header>
+            <div class="search-box">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" placeholder="Search active alerts or user IDs...">
+            </div>
+            <div class="admin-avatar">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+            </div>
+        </header>
+
+        <div class="content">
+            <div class="dashboard-header">
+                <div>
+                    <h2>Real-time Emotional Alerts</h2>
+                    <p>Monitoring live AI analysis for high-risk emotional crisis triggers.</p>
+                </div>
+            </div>
+
+            <div class="alerts-layout">
+                
+                <!-- COLUMNA IZQUIERDA: LISTA DE ALERTAS ACTIVAS -->
+                <div>
+                    <!-- ALERTA 1: RIESGO ALTO -->
+                    <div class="alert-card">
+                        <div class="alert-header">
+                            <div class="alert-user-badge">
+                                <span class="material-symbols-outlined" style="color:#C0392B;">person_alert</span>
+                                <span>USER ID: USR-8821</span>
+                            </div>
+                            <div class="assigned-prof">Assigned: Dr. Sarah Vance</div>
+                        </div>
+
+                        <div style="font-size: 11px; color: #7F8C8D; margin-bottom: 12px;">
+                            Detected 2 minutes ago • Session #04
+                        </div>
+
+                        <div class="alert-body">
+                            <div class="metric-mini-box">
+                                <span class="metric-mini-label">Detected Keywords</span>
+                                <div class="metric-mini-value">hopeless, panic, no way out</div>
+                            </div>
+                            <div class="metric-mini-box">
+                                <span class="metric-mini-label">Sentiment Score</span>
+                                <div class="metric-mini-value">92% Crisis Level</div>
+                            </div>
+                        </div>
+
+                        <div class="alert-actions">
+                            <button class="btn-emergency"><span class="material-symbols-outlined" style="font-size:16px;">e911_emergency</span> Notify Emergency Services</button>
+                            <button class="btn-escalate">Review Chat History</button>
+                            <button class="btn-escalate">Escalate to Professional</button>
+                        </div>
+                    </div>
+
+                    <!-- ALERTA 2: RIESGO MEDIO -->
+                    <div class="alert-card" style="border-color:#FADBD8; border-left-color: #F39C12;">
+                        <div class="alert-header">
+                            <div class="alert-user-badge">
+                                <span class="material-symbols-outlined" style="color:#F39C12;">warning</span>
+                                <span>USER ID: USR-9102</span>
+                            </div>
+                            <div class="assigned-prof" style="color: #7F8C8D;">Unassigned</div>
+                        </div>
+
+                        <div style="font-size: 11px; color: #7F8C8D; margin-bottom: 12px;">
+                            Detected 14 minutes ago • Session #01
+                        </div>
+
+                        <div class="alert-body">
+                            <div class="metric-mini-box">
+                                <span class="metric-mini-label">Detected Keywords</span>
+                                <div class="metric-mini-value" style="color:#F39C12;">anxious, heavy, insomnia</div>
+                            </div>
+                            <div class="metric-mini-box">
+                                <span class="metric-mini-label">Sentiment Score</span>
+                                <div class="metric-mini-value" style="color:#F39C12;">64% Medium Risk</div>
+                            </div>
+                        </div>
+
+                        <div class="alert-actions">
+                            <button class="btn-escalate">Review Chat History</button>
+                            <button class="btn-escalate">Escalate to Professional</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COLUMNA DERECHA: MÉTRICAS IA Y EQUIPO -->
+                <div class="side-panel">
+                    
+                    <!-- CONFIABILIDAD IA -->
+                    <div class="ai-card">
+                        <div class="ai-card-title">AI Detection Reliability</div>
+                        <div class="ai-card-value">98.4%</div>
+                        <div class="ai-card-sub">Model v2.4-Triage currently processing 142 simultaneous sessions with high accuracy.</div>
+                    </div>
+
+                    <!-- EQUIPO DE RESPUESTA INTERNA -->
+                    <div class="panel-card">
+                        <span style="font-size: 12px; font-weight: 700;">Internal Response Team</span>
+                        <ul class="team-list">
+                            <li class="team-item">
+                                <span>Marcus Thorne</span>
+                                <div class="team-status"></div>
+                            </li>
+                            <li class="team-item">
+                                <span>Elena Rodriguez</span>
+                                <div class="team-status"></div>
+                            </li>
+                            <li class="team-item">
+                                <span>David S. (Super Admin)</span>
+                                <div class="team-status"></div>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+</body>
+</html>

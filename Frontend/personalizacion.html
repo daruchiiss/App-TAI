@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAI - Personalización</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #EAE5DB; 
+            margin: 0; padding: 0;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+        }
+        #mockup-phone {
+            width: 375px; height: 812px; 
+            border: 14px solid #0D131A; border-radius: 45px;
+            overflow: hidden; display: flex; flex-direction: column;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25); position: relative;
+            background-color: #F7F5F0; padding: 60px 24px 30px 24px; box-sizing: border-box;
+        }
+        #iphone-notch {
+            width: 140px; height: 28px; background-color: #0D131A;
+            border-bottom-left-radius: 18px; border-bottom-right-radius: 18px;
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%); z-index: 10;
+        }
+        .container {
+            display: flex; flex-direction: column; width: 100%; height: 100%; overflow-y: auto;
+        }
+        
+        /* Header & Progress Bar */
+        .header-nav { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 15px; }
+        .btn-back {
+            width: 32px; height: 32px; border-radius: 50%; border: 1px solid #E2E8F0;
+            background: white; display: flex; justify-content: center; align-items: center; cursor: pointer; color: #1A3B68;
+        }
+        .header-nav h2 { font-size: 16px; font-weight: 600; color: #1A3B68; margin: 0; }
+        .avatar-gradient { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #A1C4FD 0%, #C2E9FB 100%); }
+        
+        .progress-container { display: flex; gap: 6px; width: 100%; margin-bottom: 20px; }
+        .progress-bar { flex: 1; height: 4px; border-radius: 2px; background-color: #E2E8F0; }
+        .progress-bar.active { background-color: #1A3B68; }
+
+        /* Typography */
+        .step-label { font-size: 12px; color: #8A99AD; margin: 0 0 4px 0; }
+        .main-title { font-size: 20px; font-weight: 700; color: #1A3B68; margin: 0 0 8px 0; }
+        .subtitle { font-size: 12px; color: #6A7B8C; line-height: 1.5; margin: 0 0 20px 0; }
+        .section-title { font-size: 13px; font-weight: 600; color: #1A3B68; margin: 15px 0 10px 0; }
+
+        /* Selectable Option Groups */
+        .options-flex { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+        
+        /* Pills style (Motivos, Género, Modalidad) */
+        .pill {
+            background-color: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 20px;
+            padding: 8px 16px; font-size: 12px; color: #4A5568; cursor: pointer;
+            transition: all 0.2s ease; user-select: none;
+        }
+        .pill.selected { background-color: #1A3B68; border-color: #1A3B68; color: #FFFFFF; font-weight: 500; }
+
+        /* Block style (Preferencia especialista) */
+        .block-option {
+            flex: 1; background-color: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px;
+            padding: 12px; font-size: 12px; color: #4A5568; cursor: pointer;
+            display: flex; align-items: center; gap: 10px; transition: all 0.2s ease;
+        }
+        .block-option .radio-circle {
+            width: 14px; height: 14px; border-radius: 50%; border: 2px solid #A0AEC0;
+            display: flex; justify-content: center; align-items: center; box-sizing: border-box;
+        }
+        .block-option.selected { border-color: #1A3B68; background-color: #F4F7FA; color: #1A3B68; font-weight: 500; }
+        .block-option.selected .radio-circle { border-color: #1A3B68; background-color: #1A3B68; }
+
+        /* Action Buttons */
+        .btn-primary {
+            width: 100%; background-color: #1A3B68; color: #FFFFFF;
+            border: none; border-radius: 20px; padding: 14px;
+            font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer;
+            margin-top: 25px; box-shadow: 0 4px 12px rgba(26, 59, 104, 0.2);
+        }
+        .skip-link { font-size: 12px; text-decoration: underline; color: #6A7B8C; text-align: center; margin-top: 15px; display: block; cursor: pointer; }
+        
+        /* Disclaimer Bottom */
+        .disclaimer-box {
+            background-color: #FFFFFF; border-radius: 12px; padding: 10px;
+            font-size: 11px; color: #6A7B8C; text-align: center; margin-top: auto; margin-bottom: 5px;
+        }
+
+        @media (max-width: 420px) {
+            #mockup-phone { border: none; border-radius: 0; width: 100vw; height: 100vh; padding-top: 40px; }
+            #iphone-notch { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="mockup-phone">
+        <div id="iphone-notch"></div>
+        
+        <div class="container">
+            <!-- Top Header -->
+            <div class="header-nav">
+                <button class="btn-back" onclick="window.location.href='legal.html'"><i class="fas fa-arrow-left"></i></button>
+                <h2>Personalización</h2>
+                <div class="avatar-gradient"></div>
+            </div>
+
+            <!-- Steps Bars -->
+            <div class="progress-container">
+                <div class="progress-bar active"></div>
+                <div class="progress-bar active"></div>
+                <div class="progress-bar"></div>
+            </div>
+
+            <p class="step-label">Paso 2 de 3</p>
+            <h1 class="main-title">¿Cuéntanos qué buscas?</h1>
+            <p class="subtitle">Esto nos permite conectarte con el profesional ideal para ti.</p>
+
+            <!-- 1. Motivos de consulta -->
+            <div class="section-title">Motivos de consulta</div>
+            <div class="options-flex">
+                <div class="pill selected" onclick="togglePill(this)">Ansiedad</div>
+                <div class="pill" onclick="togglePill(this)">Depresión</div>
+                <div class="pill" onclick="togglePill(this)">Estrés laboral</div>
+                <div class="pill" onclick="togglePill(this)">Duelo</div>
+                <div class="pill" onclick="togglePill(this)">Crecimiento personal</div>
+                <div class="pill" onclick="togglePill(this)">Problemas de pareja</div>
+            </div>
+
+            <!-- 2. Preferencia de especialista -->
+            <div class="section-title">Preferencia de especialista</div>
+            <div class="options-flex">
+                <div class="block-option selected" onclick="selectRadio(this, 'especialista')">
+                    <div class="radio-circle"></div>
+                    <span>Psicólogo clínico</span>
+                </div>
+                <div class="block-option" onclick="selectRadio(this, 'especialista')">
+                    <div class="radio-circle"></div>
+                    <span>Psiquiatra</span>
+                </div>
+            </div>
+
+            <!-- 3. Preferencia de género -->
+            <div class="section-title">Preferencia de género</div>
+            <div class="options-flex">
+                <div class="pill" onclick="selectSinglePill(this, 'genero')">Hombre</div>
+                <div class="pill" onclick="selectSinglePill(this, 'genero')">Mujer</div>
+                <div class="pill selected" onclick="selectSinglePill(this, 'genero')">Sin preferencia</div>
+            </div>
+
+            <!-- 4. Modalidad preferida -->
+            <div class="section-title">Modalidad preferida</div>
+            <div class="options-flex">
+                <div class="pill selected" onclick="selectSinglePill(this, 'modalidad')">Videollamada</div>
+                <div class="pill" onclick="selectSinglePill(this, 'modalidad')">Presencial</div>
+            </div>
+
+            <!-- Actions -->
+            <button class="btn-primary" onclick="window.location.href='chatbot_update.html'">Continuar</button>
+            <span class="skip-link" onclick="window.location.href='chatbot_update.html'">Omitir por ahora</span>
+
+            <!-- Footer Secure Disclaimer -->
+            <div class="disclaimer-box">
+                Tus datos están protegidos por sigilo clínico
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Permite selección múltiple (ej. motivos de consulta)
+        function togglePill(element) {
+            element.classList.toggle('selected');
+        }
+
+        // Permite selección única estilo Radio Button dentro de un grupo de Pills
+        function selectSinglePill(element, groupName) {
+            const siblings = element.parentNode.querySelectorAll('.pill');
+            siblings.forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+        }
+
+        // Permite selección única para los bloques con círculo simulando Radio
+        function selectRadio(element, groupName) {
+            const siblings = element.parentNode.querySelectorAll('.block-option');
+            siblings.forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+        }
+    </script>
+</body>
+</html>

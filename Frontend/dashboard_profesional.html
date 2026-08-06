@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAI - Dashboard Profesional</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+        body { background-color: #f4f5f7; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        
+        /* Contenedor Mockup Móvil */
+        .phone-container { width: 380px; height: 780px; background: #ffffff; border-radius: 40px; border: 12px solid #111; box-shadow: 0 20px 40px rgba(0,0,0,0.15); display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        
+        .header { padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .prof-info { display: flex; align-items: center; gap: 10px; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background: #e0e7ff; display: flex; align-items: center; justify-content: center; color: #4f46e5; font-weight: bold; }
+        
+        .dashboard-content { padding: 0 20px 20px; flex: 1; overflow-y: auto; }
+        
+        /* Tarjetas de Métricas */
+        .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .card { background: #1e293b; color: white; border-radius: 16px; padding: 15px; position: relative; }
+        .card.alert-card-bg { background: #ffffff; border: 1px solid #e2e8f0; color: #1e293b; }
+        .card-title { font-size: 11px; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px; }
+        .card-value { font-size: 28px; font-weight: 700; margin-top: 5px; }
+        .card-icon { position: absolute; right: 15px; top: 15px; opacity: 0.3; font-size: 20px; }
+        .alert-card-bg .card-icon { color: #ef4444; opacity: 1; }
+
+        /* Banner de Estado */
+        .status-banner { background: #ecfdf5; color: #059669; padding: 10px; border-radius: 10px; font-size: 12px; font-weight: 500; display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
+        .dot { width: 8px; height: 8px; background: #10b981; border-radius: 50%; animation: pulse 1.5s infinite; }
+        
+        /* Lista de Alertas */
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .section-title { font-size: 14px; font-weight: 600; color: #1e293b; }
+        .priority-badge { font-size: 10px; color: #ef4444; background: #fef2f2; padding: 2px 8px; border-radius: 12px; font-weight: 600; }
+        
+        .alert-item { background: #fff5f5; border: 1px solid #fee2e2; border-left: 4px solid #ef4444; border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+        .alert-item-title { font-size: 12px; font-weight: 700; color: #991b1b; display: flex; justify-content: space-between; }
+        .alert-item-desc { font-size: 11px; color: #7f1d1d; margin: 4px 0 8px 0; }
+        .btn-atender { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; width: 100%; transition: background 0.2s; }
+        .btn-atender:hover { background: #dc2626; }
+        
+        .empty-alerts { text-align: center; color: #94a3b8; font-size: 12px; padding: 20px 0; }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div class="phone-container">
+        <!-- Header del Profesional -->
+        <div class="header">
+            <div class="prof-info">
+                <div class="avatar"><i class="fa-solid fa-user-doctor"></i></div>
+                <div>
+                    <h3 style="font-size: 14px; color: #0f172a;">Dr. García</h3>
+                    <span style="font-size: 11px; color: #10b981;">● En línea</span>
+                </div>
+            </div>
+            <i class="fa-regular fa-bell" style="color: #64748b; font-size: 18px;"></i>
+        </div>
+
+        <div class="dashboard-content">
+            <!-- Métricas Principales -->
+            <div class="card" style="margin-bottom: 12px;">
+                <div class="card-title">Total Pacientes Asignados</div>
+                <div class="card-value">42</div>
+                <i class="fa-solid fa-users card-icon"></i>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="card" style="background: #f8fafc; color: #1e293b; border: 1px solid #e2e8f0;">
+                    <div class="card-title">Sesiones Hoy</div>
+                    <div class="card-value">8</div>
+                    <i class="fa-regular fa-calendar card-icon" style="color: #64748b; opacity: 1;"></i>
+                </div>
+
+                <div class="card alert-card-bg">
+                    <div class="card-title" style="color: #ef4444; font-weight: 600;">Alertas Pendientes</div>
+                    <div class="card-value" id="pending-count" style="color: #ef4444;">0</div>
+                    <i class="fa-solid fa-triangle-exclamation card-icon"></i>
+                </div>
+            </div>
+
+            <!-- Banner de conexión activa -->
+            <div class="status-banner">
+                <div class="dot"></div>
+                <span>Monitoreando alertas en tiempo real</span>
+            </div>
+
+            <!-- Sección de Alertas Clínicas -->
+            <div class="section-header">
+                <span class="section-title">Alertas Clínicas</span>
+                <span class="priority-badge">High Priority</span>
+            </div>
+
+            <!-- Contenedor dinámico donde se cargarán las alertas -->
+            <div id="lista-alertas">
+                <div class="empty-alerts">Esperando alertas...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Integrado Directo para evitar ERR_FILE_NOT_FOUND -->
+    <script>
+    const BACKEND_URL = "http://127.0.0.1:5000"; 
+    const PROFESIONAL_ID = "prof_001";
+
+    async function consultarAlertasPendientes() {
+        try {
+            const response = await fetch(`${BACKEND_URL}/profesional/alertas?profesional_id=${PROFESIONAL_ID}`);
+            
+            if (!response.ok) return;
+
+            const data = await response.json();
+            const alertas = data.alertas || [];
+
+            // 1. Contador
+            const badgeContador = document.getElementById("pending-count");
+            if (badgeContador) badgeContador.innerText = alertas.length;
+
+            // 2. Renderizar lista
+            const contenedor = document.getElementById("lista-alertas");
+            if (!contenedor) return;
+
+            if (alertas.length === 0) {
+                contenedor.innerHTML = '<div class="empty-alerts">No hay alertas de crisis pendientes.</div>';
+            } else {
+                contenedor.innerHTML = alertas.map(alerta => `
+                    <div class="alert-item">
+                        <div class="alert-item-title">
+                            <span>🚨 Alerta de ${alerta.tipo_alerta || 'CRISIS'}</span>
+                            <small style="font-size: 10px; opacity: 0.7;">ID Usuario: ${alerta.usuario_id}</small>
+                        </div>
+                        <div class="alert-item-desc">
+                            ${alerta.resumen_ia || 'Se ha detectado una situación de riesgo que requiere atención.'}
+                        </div>
+                        <!-- FIX: Se usa alerta.id en vez de alerta.alerta_id -->
+                        <button class="btn-atender" onclick="atenderAlerta(${alerta.id})">
+                            Atender y Procesar
+                        </button>
+                    </div>
+                `).join("");
+            }
+
+        } catch (error) {
+            console.error("Error al conectar con la API de alertas:", error);
+        }
+    }
+
+    // Al hacer clic en "Atender y Procesar", redirigimos a la vista de detalle de la alerta
+    function atenderAlerta(alertaId) {
+        if (!alertaId) {
+            alert("Error: ID de alerta no válido.");
+            return;
+        }
+        window.location.href = `alerta_de_canalizacion.html?alerta_id=${alertaId}`;
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        consultarAlertasPendientes();
+        setInterval(consultarAlertasPendientes, 5000); 
+    });
+</script>
+</body>
+</html>

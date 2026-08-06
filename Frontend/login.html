@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAI - Iniciar Sesión / Registro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif; 
+            background-color: #EAE5DB; 
+            margin: 0; padding: 0; 
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh;
+        }
+
+        #mockup-phone {
+            width: 375px; 
+            min-height: 812px; 
+            border: 14px solid #0D131A; 
+            border-radius: 45px;
+            overflow: hidden; 
+            display: flex; flex-direction: column; 
+            background-color: #F7F5F0;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25); 
+            position: relative; 
+            padding: 50px 24px 30px 24px;
+        }
+
+        #iphone-notch {
+            width: 140px; height: 28px; background-color: #0D131A;
+            border-bottom-left-radius: 18px; border-bottom-right-radius: 18px;
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            z-index: 10;
+        }
+
+        .header-container { text-align: center; margin-top: 15px; margin-bottom: 20px; }
+        
+        /* --- LOGO TAI --- */
+        .tai-logo-container {
+            position: relative;
+            width: 50px; height: 50px;
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+            margin: 0 auto 10px auto;
+        }
+        .tai-ghost {
+            width: 42px; height: 28px; background-color: #1A3B68;
+            border-radius: 24px 24px 0 0; position: relative; display: flex;
+            justify-content: center; gap: 8px; padding-top: 10px;
+            clip-path: polygon(0% 0%, 100% 0%, 100% 85%, 83% 100%, 66% 85%, 50% 100%, 33% 85%, 16% 100%, 0% 85%);
+        }
+        .tai-eye { width: 5px; height: 5px; background-color: #FFFFFF; border-radius: 50%; }
+        .tai-star {
+            width: 14px; height: 14px; background-color: #F7A8B8;
+            clip-path: polygon(50% 0%, 65% 35%, 100% 50%, 65% 65%, 50% 100%, 35% 65%, 0% 50%, 35% 35%);
+            margin-bottom: 3px; animation: float 2s ease-in-out infinite;
+        }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+
+        .title { color: #1A3B68; font-size: 22px; font-weight: 700; margin: 0; text-transform: lowercase; }
+        .subtitle { color: #7B889B; font-size: 12px; margin: 4px 0 0 0; }
+
+        /* Botones SSO */
+        .sso-button {
+            width: 100%; background-color: #FFFFFF; border: 1px solid #E2E8F0;
+            border-radius: 12px; padding: 10px; font-size: 13px; font-weight: 500;
+            color: #1A3B68; display: flex; align-items: center; justify-content: center;
+            gap: 10px; cursor: pointer; margin-bottom: 8px; transition: background 0.2s;
+        }
+        .sso-button:hover { background-color: #F1F5F9; }
+
+        .divider {
+            display: flex; align-items: center; text-align: center;
+            color: #A0AEC0; font-size: 11px; margin: 12px 0;
+        }
+        .divider::before, .divider::after {
+            content: ''; flex: 1; border-bottom: 1px solid #E2E8F0;
+        }
+        .divider span { padding: 0 8px; }
+
+        /* Selectores de Rol */
+        .role-selector {
+            display: flex; background: #EAE6DF; border-radius: 12px; padding: 3px; margin-bottom: 14px;
+        }
+        .role-option {
+            flex: 1; text-align: center; padding: 8px; font-size: 12px; font-weight: 600;
+            color: #64748B; border-radius: 9px; cursor: pointer; transition: all 0.2s ease;
+        }
+        .role-option.active { background: #FFFFFF; color: #1A3B68; box-shadow: 0 2px 5px rgba(0,0,0,0.08); }
+
+        /* Formulario e Inputs */
+        form { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+        .input-label { font-size: 11px; font-weight: 600; color: #1A3B68; margin-bottom: -4px; }
+        .input-group { position: relative; display: flex; align-items: center; }
+        .input-group i { position: absolute; left: 14px; color: #8A99AD; font-size: 13px; }
+        .input-field {
+            width: 100%; background-color: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px;
+            padding: 12px 14px 12px 38px; font-size: 12px; color: #2C3E50; outline: none; font-family: 'Poppins', sans-serif;
+        }
+
+        .btn-submit {
+            width: 100%; background-color: #1A3B68; color: white; border: none; border-radius: 12px;
+            padding: 14px; font-size: 13px; font-weight: 600; cursor: pointer;
+            margin-top: 6px; box-shadow: 0 4px 12px rgba(26, 59, 104, 0.2); transition: background 0.2s;
+        }
+        .btn-submit:hover { background-color: #254d85; }
+
+        /* Footer y enlaces */
+        .footer-links { text-align: center; margin-top: 14px; font-size: 12px; color: #64748B; }
+        .footer-links a { color: #1A3B68; text-decoration: none; font-weight: 600; }
+        .pro-toggle {
+            display: block; text-align: center; margin-top: 12px; font-size: 11px;
+            color: #1A3B68; text-decoration: underline; cursor: pointer; font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="mockup-phone">
+        <div id="iphone-notch"></div>
+        
+        <div class="header-container">
+            <div class="tai-logo-container">
+                <div class="tai-star"></div>
+                <div class="tai-ghost">
+                    <div class="tai-eye"></div>
+                    <div class="tai-eye"></div>
+                </div>
+            </div>
+            <h1 class="title">tai</h1>
+            <p class="subtitle" id="subtitle-text">Tu espacio de acompañamiento emocional</p>
+        </div>
+
+        <!-- Botones Redes Sociales -->
+        <button class="sso-button" type="button"><i class="fab fa-google"></i> Continuar con Google</button>
+        <button class="sso-button" type="button"><i class="fab fa-apple"></i> Continuar con Apple</button>
+
+        <div class="divider"><span>o continúa con tu correo</span></div>
+
+        <!-- Selector de Rol (Paciente / Profesional) -->
+        <div class="role-selector" id="role-selector">
+            <div class="role-option active" onclick="setRole('paciente')">Paciente</div>
+            <div class="role-option" onclick="setRole('profesional')">Profesional</div>
+        </div>
+
+        <!-- Formulario dinámico -->
+        <form id="auth-form">
+            <input type="hidden" id="selected-role" value="paciente">
+            
+            <div id="field-nombre" style="display: none;">
+                <label class="input-label">Nombre completo</label>
+                <div class="input-group">
+                    <i class="far fa-user"></i>
+                    <input type="text" id="input-nombre" class="input-field" placeholder="Tu nombre">
+                </div>
+            </div>
+
+            <label class="input-label">Correo electrónico</label>
+            <div class="input-group">
+                <i class="far fa-envelope"></i>
+                <input type="email" id="input-email" class="input-field" placeholder="ejemplo@gmail.com" required>
+            </div>
+
+            <label class="input-label">Contraseña</label>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="input-password" class="input-field" placeholder="••••••••" required>
+            </div>
+
+            <div id="field-licencia" style="display: none;">
+                <label class="input-label">Número de Licencia / Cédula</label>
+                <div class="input-group">
+                    <i class="fas fa-id-card"></i>
+                    <input type="text" id="input-licencia" class="input-field" placeholder="Cédula profesional">
+                </div>
+            </div>
+
+            <button type="submit" id="btn-submit" class="btn-submit">Iniciar sesión</button>
+        </form>
+
+        <div class="footer-links">
+            <span id="toggle-prompt">¿No tienes cuenta?</span> 
+            <a href="#" id="toggle-auth-mode" onclick="toggleAuthMode(event)">Regístrate ahora</a>
+        </div>
+
+        <a class="pro-toggle" id="pro-link" onclick="quickSelectPro(event)">Soy profesional de salud mental →</a>
+    </div>
+
+    <<script>
+    // 1. Configuración global
+    const BASE_URL = "http://127.0.0.1:5000"; // URL de tu servidor Flask
+    let isLogin = true; // Estado inicial
+
+    // 2. Selección de Rol (Paciente / Profesional)
+    function setRole(role) {
+        document.getElementById("selected-role").value = role;
+        const options = document.querySelectorAll(".role-option");
+        
+        if (role === 'paciente') {
+            options[0].classList.add("active");
+            options[1].classList.remove("active");
+            document.getElementById("field-licencia").style.display = "none";
+        } else {
+            options[1].classList.add("active");
+            options[0].classList.remove("active");
+            if (!isLogin) {
+                document.getElementById("field-licencia").style.display = "block";
+            }
+        }
+    }
+
+    // 3. Cambiar entre Modo Login y Modo Registro
+    function toggleAuthMode(e) {
+        if(e) e.preventDefault();
+        isLogin = !isLogin;
+
+        const submitBtn = document.getElementById("btn-submit");
+        const togglePrompt = document.getElementById("toggle-prompt");
+        const toggleLink = document.getElementById("toggle-auth-mode");
+        const nombreField = document.getElementById("field-nombre");
+        const licenciaField = document.getElementById("field-licencia");
+        const currentRole = document.getElementById("selected-role").value;
+
+        if (isLogin) {
+            submitBtn.innerText = "Iniciar sesión";
+            togglePrompt.innerText = "¿No tienes cuenta?";
+            toggleLink.innerText = "Regístrate ahora";
+            if (nombreField) nombreField.style.display = "none";
+            if (licenciaField) licenciaField.style.display = "none";
+        } else {
+            // Si rediriges a otra página de registro:
+            if (currentRole === 'profesional') {
+                window.location.href = "registro_profesional.html";
+            } else {
+                window.location.href = "registro.html";
+            }
+        }
+    }
+
+    // 4. Selección rápida de Profesional
+    function quickSelectPro(e) {
+        e.preventDefault();
+        setRole('profesional');
+    }
+
+    // 5. Envío del Formulario (Submit)
+    document.getElementById("auth-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const role = document.getElementById("selected-role").value;
+        const email = document.getElementById("input-email").value.trim();
+        const password = document.getElementById("input-password").value;
+        
+        // Elementos opcionales según el formulario
+        const inputNombre = document.getElementById("input-nombre");
+        const inputLicencia = document.getElementById("input-licencia");
+        
+        const nombre = inputNombre ? inputNombre.value.trim() : "";
+        const licencia = inputLicencia ? inputLicencia.value.trim() : "";
+
+        const endpoint = isLogin ? "/login" : "/register";
+        
+        const payload = {
+            email: email,
+            password: password,
+            rol: role,
+            ...(!isLogin && { nombre: nombre }),
+            ...(!isLogin && role === 'profesional' && { licencia: licencia })
+        };
+
+        try {
+            const respuesta = await fetch(`${BASE_URL}${endpoint}`, {
+                method: "POST",
+                headers: { 
+                    "Content-Type": "application/json" 
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const datos = await respuesta.json();
+
+            if (respuesta.ok && (datos.exito || datos.success)) {
+                // Guardar sesión
+                localStorage.setItem("usuario_id", datos.usuario_id);
+                localStorage.setItem("usuario_rol", role);
+
+                // Redirección según el Rol
+                if (role === 'profesional') {
+                    window.location.href = "dashboard_profesional.html";
+                } else {
+                    window.location.href = "chatbot_update.html";
+                }
+            } else {
+                alert(datos.mensaje || "Error en las credenciales o en la solicitud.");
+            }
+        } catch (error) {
+            console.error("Error al conectar con Flask:", error);
+            alert("No se pudo conectar con el servidor. Asegúrate de ejecutar 'python app.py' y usar http://127.0.0.1:5000 en tu navegador.");
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAI - Visualización del Flujo de Integración</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        /* TABS */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            border: 2px solid white;
+            background: transparent;
+            color: white;
+            cursor: pointer;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            background: white;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* FLOW DIAGRAM */
+        .flow-diagram {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            opacity: 0;
+            animation: slideIn 0.6s ease forwards;
+        }
+
+        .flow-step:nth-child(1) { animation-delay: 0.1s; }
+        .flow-step:nth-child(2) { animation-delay: 0.2s; }
+        .flow-step:nth-child(3) { animation-delay: 0.3s; }
+        .flow-step:nth-child(4) { animation-delay: 0.4s; }
+        .flow-step:nth-child(5) { animation-delay: 0.5s; }
+        .flow-step:nth-child(6) { animation-delay: 0.6s; }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .flow-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin-right: 20px;
+        }
+
+        .flow-content {
+            flex: 1;
+        }
+
+        .flow-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .flow-desc {
+            font-size: 0.95em;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .flow-code {
+            background: #f5f5f5;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            color: #d63384;
+            border-left: 3px solid #667eea;
+            margin-top: 8px;
+        }
+
+        .arrow {
+            text-align: center;
+            color: #667eea;
+            font-size: 1.5em;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+        /* CARDS */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-icon {
+            font-size: 2em;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .card-desc {
+            color: #666;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .card-code {
+            background: #f5f5f5;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.85em;
+            color: #d63384;
+            margin-top: 12px;
+            overflow-x: auto;
+        }
+
+        /* CHECKLIST */
+        .checklist {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .checklist-item:hover {
+            background: #f9f9f9;
+        }
+
+        .checklist-item:last-child {
+            border-bottom: none;
+        }
+
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #667eea;
+            border-radius: 6px;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox.checked {
+            background: #667eea;
+            color: white;
+        }
+
+        .checklist-text {
+            flex: 1;
+        }
+
+        .checklist-title {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 3px;
+        }
+
+        .checklist-desc {
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        .checklist-item.done .checklist-text {
+            color: #999;
+        }
+
+        /* TIMELINE */
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .timeline-item {
+            display: flex;
+            margin-bottom: 30px;
+        }
+
+        .timeline-marker {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .timeline-marker::after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            height: 60px;
+            background: linear-gradient(to bottom, #667eea, transparent);
+            left: 50%;
+            top: 100%;
+            transform: translateX(-50%);
+        }
+
+        .timeline-item:last-child .timeline-marker::after {
+            display: none;
+        }
+
+        .timeline-content {
+            margin-left: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .timeline-title {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .timeline-desc {
+            color: #666;
+            font-size: 0.95em;
+            margin-bottom: 8px;
+        }
+
+        .timeline-meta {
+            font-size: 0.85em;
+            color: #999;
+        }
+
+        /* SECTION TITLE */
+        .section-title {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        /* FOOTER */
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .footer-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .flow-diagram {
+                padding: 20px;
+            }
+
+            .flow-step {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .flow-icon {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .timeline-item {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .timeline-marker {
+                margin-bottom: 15px;
+            }
+
+            .timeline-marker::after {
+                width: 60px;
+                height: 2px;
+                top: 50%;
+                left: 100%;
+                transform: translateY(-50%);
+            }
+
+            .timeline-item:last-child .timeline-marker::after {
+                display: none;
+            }
+
+            .timeline-content {
+                margin-left: 0;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌟 TAI - Flujo de Integración</h1>
+            <p class="subtitle">Visualización del sistema de reportes en tiempo real</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('flujo')">Flujo General</button>
+            <button class="tab-btn" onclick="switchTab('componentes')">Componentes</button>
+            <button class="tab-btn" onclick="switchTab('implementacion')">Implementación</button>
+            <button class="tab-btn" onclick="switchTab('arquitectura')">Arquitectura</button>
+        </div>
+
+        <!-- TAB 1: FLUJO GENERAL -->
+        <div id="flujo" class="tab-content active">
+            <h2 class="section-title">📊 Flujo General del Sistema</h2>
+            
+            <div class="flow-diagram">
+                <div class="flow-step">
+                    <div class="flow-icon">👤</div>
+                    <div class="flow-content">
+                        <div class="flow-title">1. Paciente Escribe Mensaje</div>
+                        <div class="flow-desc">El usuario escribe un mensaje en el chatbot de TAI</div>
+                        <div class="flow-code">chatbot_updated.html → userInput.value = "Estoy en peligro"</div>
+                    </div>
+                </div>
+                <div class="arrow">↓</div>
+
+                <div class="flow-step">
+                    <div class="flow-icon">🔄</div>
+                    <div class="flow-content">
+                        <div class="flow-title">2. Frontend Envía a Backend</div>
+                        <div class="flow-desc">JavaScript envía el mensaje al servidor</div>
+                        <div class="flow-code">POST /chat → {mensaje, usuario_id}</div>
+                    </div>
+                </div>
+                <div class="arrow">↓</div>
+
+                <div class="flow-step">
+                    <div class="flow-icon">🤖</div>
+                    <div class="flow-content">
+                        <div class="flow-title">3. Backend Procesa & Detecta Crisis</div>
+                        <div class="flow-desc">Flask procesa el mensaje con IA y detecta nivel de severidad</div>
+                        <div class="flow-code">nivel_escalamiento = 3 (CRISIS)</div>
+                    </div>
+                </div>
+                <div class="arrow">↓</div>
+
+                <div class="flow-step">
+                    <div class="flow-icon">📨</div>
+                    <div class="flow-content">
+                        <div class="flow-title">4. Backend Envía Reporte</div>
+                        <div class="flow-desc">Si es crisis, guarda alerta en BD y notifica al profesional</div>
+                        <div class="flow-code">INSERT alertas_criticas → profesional_id, usuario_id, datos</div>
+                    </div>
+                </div>
+                <div class="arrow">↓</div>
+
+                <div class="flow-step">
+                    <div class="flow-icon">👨‍⚕️</div>
+                    <div class="flow-content">
+                        <div class="flow-title">5. Profesional Recibe Alerta</div>
+                        <div class="flow-desc">El dashboard hace polling y recibe la alerta en tiempo real</div>
+                        <div class="flow-code">GET /profesional/alertas?profesional_id=prof_001</div>
+                    </div>
+                </div>
+                <div class="arrow">↓</div>
+
+                <div class="flow-step">
+                    <div class="flow-icon">✅</div>
+                    <div class="flow-content">
+                        <div class="flow-title">6. Profesional Actúa</div>
+                        <div class="flow-desc">Hace click en "Enter" para aceptar el caso y ayudar al paciente</div>
+                        <div class="flow-code">POST /profesional/alertas/confirmar</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: COMPONENTES -->
+        <div id="componentes" class="tab-content">
+            <h2 class="section-title">🧩 Componentes de la Solución</h2>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-icon">📜</div>
+                    <div class="card-title">tai_reporte_integracion.js</div>
+                    <div class="card-desc">
+                        Módulo JavaScript que maneja toda la lógica de integración. Define tres clases principales:
+                    </div>
+                    <div class="card-code">
+                        TAIReporteManager<br>
+                        TAIUserFlow<br>
+                        TAIProfesionalFlow
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">💬</div>
+                    <div class="card-title">chatbot_updated.html</div>
+                    <div class="card-desc">
+                        Interfaz del paciente. Utiliza <strong>TAIUserFlow</strong> para enviar mensajes y reportes automáticamente cuando detecta crisis.
+                    </div>
+                    <div class="card-code">
+                        const userFlow = new TAIUserFlow();
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">📊</div>
+                    <div class="card-title">dashboard_profesional_updated.html</div>
+                    <div class="card-desc">
+                        Interfaz del profesional. Utiliza <strong>TAIProfesionalFlow</strong> para monitorear alertas en tiempo real.
+                    </div>
+                    <div class="card-code">
+                        const profesionalFlow = new TAIProfesionalFlow(id);
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">🔌</div>
+                    <div class="card-title">Backend Endpoints</div>
+                    <div class="card-desc">
+                        Tres nuevos endpoints en Flask que manejan el envío, recepción y confirmación de alertas.
+                    </div>
+                    <div class="card-code">
+                        POST /reportes/enviar<br>
+                        GET /profesional/alertas<br>
+                        POST /profesional/alertas/confirmar
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">💾</div>
+                    <div class="card-title">Base de Datos</div>
+                    <div class="card-desc">
+                        Tabla <strong>alertas_criticas</strong> que almacena todos los reportes de crisis vinculados entre paciente y profesional.
+                    </div>
+                    <div class="card-code">
+                        usuario_id, profesional_id, <br>
+                        tipo_alerta, estado
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">⚙️</div>
+                    <div class="card-title">Polling en Tiempo Real</div>
+                    <div class="card-desc">
+                        El dashboard hace GET cada 5 segundos para recibir nuevas alertas. Configurable en milisegundos.
+                    </div>
+                    <div class="card-code">
+                        iniciarPollAlertas(callback, 5000)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: IMPLEMENTACIÓN -->
+        <div id="implementacion" class="tab-content">
+            <h2 class="section-title">✅ Checklist de Implementación</h2>
+
+            <div class="checklist">
+                <div class="section-title" style="color: #333; text-align: left; margin-bottom: 20px;">Frontend (5 minutos)</div>
+
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox">
+                        <span style="font-size: 0.7em;">✓</span>
+                    </div>
+                    <div class="checklist-text">
+                        <div class="checklist-title">Copiar módulo JavaScript</div>
+                        <div class="checklist-desc">tai_reporte_integracion.js → carpeta Frontend</div>
+                    </div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox">
+                        <span style="font-size: 0.7em;">✓</span>
+                    </div>
+                    <div class="checklist-text">
+                        <div class="checklist-title">Reemplazar archivos HTML</div>
+                        <div class="checklist-desc">chatbot.html → chatbot_updated.html</div>
+                    </div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox">
+                        <span style="font-size: 0.7em;">✓</span>
+                    </div>
+                    <div class="checklist-text">
+                        <div class="checklist-title">Reemplazar dashboard</div>
+                        <div class="checklist-desc">dashboard_profesional.html → dashboard_profesional_updated.html</div>
+                    </div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox">
+                        <span style="font-size: 0.7em;">✓</span>
+                    </div>
+                    <div class="checklist-text">
+                        <div class="checklist-title">Verificar imports</div>
+                        <div class="checklist-desc">&lt;script src="../tai_reporte_integracion.js"&gt;</div>
+                    </div>
+                </div>
+
+                <div style="height: 20px;"></div>
+                <div class="section-title" style="color: #333; text-align: left; margin-bottom: 20px;">Backend (15-20 minutos)</div>
+
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox">
+                        <span style="font-size: 0.7em;">✓</span>
+                    </div>
+                    <div class="checklist-text">
+                        <div class="checklist-title">Crear POST /reportes/enviar</div>
+                        <div class="checklist-desc">Recibe y guarda reporte de crisis</div>
+                    </div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox">
+                        <span style="font-size: 0.7em;">✓</span>
+                    </div>
+                    <div class="checklist-text">
+                        <div class="checklist-title">Crear GET /profesional/alertas</div>
+                        <div class="checklist-desc">Retorna alertas pendientes del profesional</div>
+                    </div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox">
+                        <span style="font-size: 0.7em;">✓</span>
+                    </div>
+                    <div class="checklist-text">
+                        <div class="checklist-title">Crear POST /profesional/alertas/confirmar</div>
+                        <div class="checklist-desc">Marca alerta como vista/procesada</div>
+                    </div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox">
+                        <span style="font-size: 0.7em;">✓</span>
+                    </div>
+                    <div class="checklist-text">
+                        <div class="checklist-title">Modificar POST /chat</div>
+                        <div class="checklist-desc">Agregar flag reporte_enviado en respuesta</div>
+                    </div>
+                </div>
+
+                <div style="height: 20px;"></div>
+                <div class="section-title" style="color: #333; text-align: left; margin-bottom: 20px;">Base de Datos (5 minutos)</div>
+
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox">
+                        <span style="font-size: 0.7em;">✓</span>
+                    </div>
+                    <div class="checklist-text">
+                        <div class="checklist-title">Crear tabla alertas_criticas</div>
+                        <div class="checklist-desc">Con usuarios_id, profesional_id, datos_clinicos, estado</div>
+                    </div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox">
+                        <span style="font-size: 0.7em;">✓</span>
+                    </div>
+                    <div class="checklist-text">
+                        <div class="checklist-title">Crear índices</div>
+                        <div class="checklist-desc">Para performance en queries frecuentes</div>
+                    </div>
+                </div>
+
+                <div style="height: 20px;"></div>
+                <div class="section-title" style="color: #333; text-align: left; margin-bottom: 20px;">Testing (10 minutos)</div>
+
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox">
+                        <span style="font-size: 0.7em;">✓</span>
+                    </div>
+                    <div class="checklist-text">
+                        <div class="checklist-title">Test envío de mensaje de crisis</div>
+                        <div class="checklist-desc">Verificar que aparezca el banner rojo</div>
+                    </div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox">
+                        <span style="font-size: 0.7em;">✓</span>
+                    </div>
+                    <div class="checklist-text">
+                        <div class="checklist-title">Test recepción en dashboard</div>
+                        <div class="checklist-desc">Verificar que alerta aparezca en tiempo real</div>
+                    </div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox">
+                        <span style="font-size: 0.7em;">✓</span>
+                    </div>
+                    <div class="checklist-text">
+                        <div class="checklist-title">Test confirmación de alerta</div>
+                        <div class="checklist-desc">Profesional acepta caso y se marca como procesada</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: ARQUITECTURA -->
+        <div id="arquitectura" class="tab-content">
+            <h2 class="section-title">🏗️ Arquitectura del Sistema</h2>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-marker">1</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Capa de Presentación (Frontend)</div>
+                        <div class="timeline-desc">
+                            <strong>chatbot_updated.html</strong> - Interfaz del paciente<br>
+                            <strong>dashboard_profesional_updated.html</strong> - Interfaz del profesional
+                        </div>
+                        <div class="timeline-meta">JavaScript + HTML/CSS</div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker">2</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Capa de Lógica de Integración</div>
+                        <div class="timeline-desc">
+                            <strong>tai_reporte_integracion.js</strong><br>
+                            - TAIReporteManager: Gestión central<br>
+                            - TAIUserFlow: Flujo del paciente<br>
+                            - TAIProfesionalFlow: Flujo del profesional
+                        </div>
+                        <div class="timeline-meta">JavaScript puro</div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker">3</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Capa de Aplicación (Backend)</div>
+                        <div class="timeline-desc">
+                            Flask Application<br>
+                            - POST /chat (existente)<br>
+                            - POST /reportes/enviar (nuevo)<br>
+                            - GET /profesional/alertas (nuevo)<br>
+                            - POST /profesional/alertas/confirmar (nuevo)
+                        </div>
+                        <div class="timeline-meta">Python + Flask</div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker">4</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Capa de Datos (BD)</div>
+                        <div class="timeline-desc">
+                            MySQL Database<br>
+                            - usuarios (existente)<br>
+                            - profesionales (existente)<br>
+                            - <strong>alertas_criticas (nuevo)</strong>
+                        </div>
+                        <div class="timeline-meta">SQL + Índices</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 40px;">
+                <h3 class="section-title" style="color: #333; margin-bottom: 20px;">Flujo de Datos de Punta a Punta</h3>
+                <div class="flow-diagram">
+                    <div class="flow-code" style="text-align: center; padding: 30px; font-size: 1em; color: #333;">
+                        👤 Paciente<br>
+                        ↓<br>
+                        chatbot_updated.html + TAIUserFlow<br>
+                        ↓<br>
+                        POST /chat + POST /reportes/enviar<br>
+                        ↓<br>
+                        Flask Backend (procesa + guarda)<br>
+                        ↓<br>
+                        MySQL: alertas_criticas table<br>
+                        ↓<br>
+                        GET /profesional/alertas (polling)<br>
+                        ↓<br>
+                        dashboard_profesional_updated.html + TAIProfesionalFlow<br>
+                        ↓<br>
+                        👨‍⚕️ Profesional ve alertas en tiempo real
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>TAI - Sistema de Integración de Reportes | <a href="#" class="footer-link">Documentación Completa</a></p>
+        <p style="margin-top: 10px; opacity: 0.8;">Última actualización: Julio 23, 2024</p>
+    </footer>
+
+    <script>
+        function switchTab(tabName) {
+            // Ocultar todos los tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Mostrar el tab seleccionado
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function toggleCheck(element) {
+            element.classList.toggle('done');
+            element.querySelector('.checkbox').classList.toggle('checked');
+        }
+    </script>
+</body>
+</html>
