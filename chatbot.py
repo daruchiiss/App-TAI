@@ -5,8 +5,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-client = anthropic.Anthropic(api_key="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")
-
+cclient = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 # Definimos la herramienta de clasificación de alerta
 tools = [
     {
