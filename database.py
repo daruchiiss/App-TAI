@@ -157,7 +157,7 @@ def obtener_historial_usuario(usuario_id):
     return resultados
 
 # ════════════════════════════════════════════════════════════════
-# FUNCIONES DE ALERTAS CRÍTICAS CORREGIDAS
+# FUNCIONES DE ALERTAS CRÍTICAS
 # ════════════════════════════════════════════════════════════════
 
 def guardar_alerta_critica(usuario_id, tipo_alerta, nivel_severidad, datos_clinicos, 

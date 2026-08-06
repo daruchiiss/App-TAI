@@ -7,35 +7,58 @@ from datetime import datetime
 from flask_cors import CORS
 import os
 
-# ⚠️ IMPORTANTE: Ajusta 'tu_modulo_ia' por el nombre real del archivo .py donde está analizar_mensaje
-# Ejemplo: si está en ia.py -> from ia import analizar_mensaje
+# ⚠️ Importar la función de análisis de IA
 try:
     from chatbot import analizar_mensaje
-except ImportError:
-    # Función de respaldo (fallback) por si el archivo de IA tiene otro nombre
+except ImportError as e:
+    print(f"⚠️ Error al importar chatbot.py: {e}")
+    # Función de respaldo por si no se puede importar
     def analizar_mensaje(historial):
         return {
             "texto_respuesta": "Hola, estoy procesando tu mensaje correctamente.",
             "clasificacion": {"nivel": "Tranquilo", "requiere_escalamiento": False}
         }
 
-# Le indicamos a Flask que busque templates en la carpeta Frontend o templates del proyecto
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-TEMPLATES_DIR = os.path.join(os.path.dirname(BASE_DIR), "Frontend")
+# ═══════════════════════════════════════════════════════════════
+# 🔧 CONFIGURACIÓN DE RUTAS - IMPORTANTE
+# ═══════════════════════════════════════════════════════════════
 
-app = Flask(__name__,)
+# BASE_DIR apunta a la carpeta donde está app.py (TAI/)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# TEMPLATES_DIR apunta a TAI/Frontend/
+TEMPLATES_DIR = os.path.join(BASE_DIR, "Frontend")
+STATIC_DIR = os.path.join(BASE_DIR, "Frontend")  # Los JS/CSS también están en Frontend
+
+print(f"✓ BASE_DIR: {BASE_DIR}")
+print(f"✓ TEMPLATES_DIR: {TEMPLATES_DIR}")
+
+# Verificar que la carpeta Frontend existe
+if not os.path.exists(TEMPLATES_DIR):
+    print(f"⚠️ ADVERTENCIA: La carpeta {TEMPLATES_DIR} NO EXISTE")
+else:
+    print(f"✓ Carpeta Frontend encontrada")
+
+# ═══════════════════════════════════════════════════════════════
+# 🚀 INICIALIZAR FLASK
+# ═══════════════════════════════════════════════════════════════
+
+app = Flask(__name__, template_folder=TEMPLATES_DIR, static_folder=STATIC_DIR)
 
 # 🌐 Configuración global de CORS sin restricciones
 CORS(app, supports_credentials=True)
 
-# Inicializamos la base de datos al arrancar
+# ═══════════════════════════════════════════════════════════════
+# 💾 INICIALIZAR BASE DE DATOS
+# ═══════════════════════════════════════════════════════════════
+
 try:
     inicializar_db()
     print("✅ Base de datos inicializada correctamente.")
 except Exception as e:
     print(f"⚠️ Error al inicializar la base de datos: {e}")
 
-# Historial indexado por usuario_id
+# Historial indexado por usuario_id (para mantener conversaciones en memoria)
 historiales_usuarios = {}
 
 # ═══════════════════════════════════════════════════════════════
@@ -45,11 +68,25 @@ historiales_usuarios = {}
 @app.route("/")
 def inicio():
     """Ruta principal que entrega la interfaz del chat"""
-    return render_template("chatbot.html")
+    return render_template("chatbot_update.html")
 
+@app.route("/login")
+def pagina_login():
+    """Página de login"""
+    return render_template("login.html")
+
+@app.route("/registro")
+def pagina_registro():
+    """Página de registro"""
+    return render_template("registro.html")
+
+@app.route("/dashboard-profesional")
+def dashboard_profesional():
+    """Dashboard para profesionales"""
+    return render_template("dashboard_profesional.html")
 
 # ═══════════════════════════════════════════════════════════════
-# 📩 RUTAS DE LA API
+# 📩 RUTAS DE LA API - CHAT
 # ═══════════════════════════════════════════════════════════════
 
 @app.route("/chat", methods=["POST", "OPTIONS"])
@@ -129,9 +166,9 @@ def chat():
 # 🔐 RUTAS DE AUTENTICACIÓN
 # ═══════════════════════════════════════════════════════════════
 
-@app.route("/registro", methods=["POST"])
-def registro():
-    """Registrar nuevo usuario"""
+@app.route("/api/registro", methods=["POST"])
+def api_registro():
+    """Registrar nuevo usuario (API)"""
     datos = request.get_json(silent=True)
     if not datos or not isinstance(datos, dict):
         return jsonify({"error": "Formato de datos inválido"}), 400
@@ -166,28 +203,36 @@ def registro():
     return jsonify({"usuario_id": usuario_id, "mensaje": "Registro exitoso"}), 201
 
 
-@app.route("/login", methods=["POST"])
-def login():
-    datos = request.get_json()
-    email = datos.get("email")
-    password = datos.get("password")
-    rol = datos.get("rol")
+@app.route("/api/login", methods=["POST"])
+def api_login():
+    """Login (API)"""
+    datos = request.get_json(silent=True)
+    if not datos:
+        return jsonify({"exito": False, "mensaje": "Datos vacíos"}), 400
 
-    # Aquí haces la validación de tu base de datos o lógica de usuario
-    if email and password:
+    email = datos.get("email", "")
+    password = datos.get("password", "")
+
+    if not email or not password:
+        return jsonify({"exito": False, "mensaje": "Email y contraseña requeridos"}), 400
+
+    usuario_id = verificar_credenciales(email, password)
+    
+    if usuario_id:
         return jsonify({
             "exito": True,
-            "usuario_id": "usr_12345",
-            "mensaje": "Inicio de sesión correcto"
+            "usuario_id": usuario_id,
+            "mensaje": "Inicio de sesión exitoso"
         }), 200
     else:
         return jsonify({
             "exito": False,
             "mensaje": "Credenciales inválidas"
-        }), 400
+        }), 401
 
-@app.route("/reiniciar", methods=["POST"])
-def reiniciar():
+
+@app.route("/api/reiniciar", methods=["POST"])
+def api_reiniciar():
     """Reiniciar el historial de conversación"""
     datos = request.get_json(silent=True) or {}
     usuario_id = datos.get("usuario_id")
@@ -309,13 +354,25 @@ def admin_obtener_usuarios():
 def admin_obtener_metricas():
     return jsonify({"total_usuarios": 150, "alertas_criticas": 5, "interacciones_hoy": 42}), 200
 
-@app.route("/reset", methods=["GET", "POST"])
+@app.route("/api/reset", methods=["GET", "POST"])
 def reset_chat():
-    global historial_conversacion
-    historial_conversacion.clear()
+    """Reiniciar el chat"""
+    global historiales_usuarios
+    historiales_usuarios.clear()
     print("\n🧹 [RESET] Historial de chat vaciado con éxito.")
     return jsonify({"status": "ok", "message": "Historial borrado"}), 200
 
+# ═══════════════════════════════════════════════════════════════
+# 🚀 PUNTO DE ENTRADA
+# ═══════════════════════════════════════════════════════════════
+
 if __name__ == "__main__":
+    print("\n" + "="*60)
+    print("🚀 TAI - Plataforma de Apoyo Emocional")
+    print("="*60)
+    print(f"📂 Ejecutando desde: {BASE_DIR}")
+    print(f"📂 Sirviendo templates desde: {TEMPLATES_DIR}")
+    print("="*60 + "\n")
+    
     # Escucha en todas las interfaces en el puerto 5000
     app.run(host="0.0.0.0", port=5000, debug=True)
