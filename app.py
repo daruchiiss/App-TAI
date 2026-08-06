@@ -374,5 +374,6 @@ if __name__ == "__main__":
     print(f"📂 Sirviendo templates desde: {TEMPLATES_DIR}")
     print("="*60 + "\n")
     
-    # Escucha en todas las interfaces en el puerto 5000
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    # Toma el puerto que asigna Railway dinámicamente o usa 5000 localmente
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
