@@ -186,8 +186,8 @@
         const TAI_API_CONFIG = {
             BASE_URL: BASE_URL_DETECTADA,
             ENDPOINTS: {
-                CHAT: "/chat",
-                ENVIAR_REPORTE: "/reportes/enviar"
+                CHAT: "/api/chat",
+                ENVIAR_REPORTE: "/api/reportes/enviar"
             },
             ESCALAMIENTO_NIVELES: {
                 1: "LEVE",
@@ -197,136 +197,142 @@
         };
 
         // 🧠 CLASE MANEJADORA DE REPORTES Y FLUJO DE ESCALAMIENTO
-       class TAIReporteManager {
-    constructor(usuarioId) {
-        // Obtenemos el ID del parámetro o de localStorage
-        const idGuardado = usuarioId || localStorage.getItem("usuario_id");
-        
-        // Guardamos el ID asegurándonos de que no sea nulo
-        this.usuarioId = idGuardado && idGuardado !== "undefined" ? idGuardado : null;
-        this.nivelActual = 1;
-        this.reporteEnviado = false;
-    }
+        class TAIReporteManager {
+            constructor(usuarioId) {
+                // 1. Intentar obtener el ID desde sesión o localStorage
+                const usuarioSession = JSON.parse(sessionStorage.getItem('usuarioTAI') || '{}');
+                let idGuardado = usuarioId || usuarioSession.id || localStorage.getItem("usuario_id") || localStorage.getItem("tai_anon_id");
 
-    // Helper interno para procesar el usuario_id
-    obtenerUsuarioIdFormateado() {
-        if (!this.usuarioId) {
-            // Reintento de última hora por si se guardó después de instanciar la clase
-            this.usuarioId = localStorage.getItem("usuario_id");
-        }
-        
-        if (!this.usuarioId) {
-            console.warn("⚠️ Atencion: No se encontró un usuario_id válido en la sesión.");
-            return null;
-        }
-
-        // Si el id es numérico puro (ej. "15"), lo convierte a entero. 
-        // Si tiene letras (ej. "usr_123"), lo mantiene como string.
-        const idNumerico = Number(this.usuarioId);
-        return !isNaN(idNumerico) ? idNumerico : this.usuarioId;
-    }
-
-    async enviarMensaje(mensaje) {
-        try {
-            const uid = this.obtenerUsuarioIdFormateado();
-            if (!uid) {
-                throw new Error("No hay un usuario_id activo para enviar el mensaje.");
-            }
-
-            const respuesta = await fetch(`${TAI_API_CONFIG.BASE_URL}${TAI_API_CONFIG.ENDPOINTS.CHAT}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'ngrok-skip-browser-warning': 'true'
-                },
-                body: JSON.stringify({
-                    mensaje: mensaje,
-                    usuario_id: uid
-                })
-            });
-
-            const datos = await respuesta.json();
-
-            if (respuesta.ok) {
-                if (datos.escalamiento_activado || datos.escalamiento?.nivel_escalamiento > 1) {
-                    await this.manejarEscalamiento(datos);
+                // 2. Si no existe ningún ID, generar uno anónimo automáticamente
+                if (!idGuardado || idGuardado === "undefined" || idGuardado === "null") {
+                    idGuardado = 'anon_' + Math.random().toString(36).substring(2, 9) + '_' + Date.now();
+                    localStorage.setItem('tai_anon_id', idGuardado);
+                    console.log("👤 Asignado usuario_id anónimo fallback:", idGuardado);
                 }
-                return datos;
-            } else {
-                throw new Error(datos.error || datos.mensaje || "Error en la respuesta del servidor");
-            }
-        } catch (error) {
-            console.error("Error enviando mensaje:", error);
-            throw error;
-        }
-    }
 
-    async manejarEscalamiento(datosChat) {
-        const nivelEscalamiento = datosChat.nivel_escalamiento || 
-                                 datosChat.escalamiento?.nivel_escalamiento || 
-                                 (datosChat.clasificacion && datosChat.clasificacion.nivel === "Crisis" ? 3 : 2);
-        
-        this.nivelActual = Math.max(this.nivelActual, nivelEscalamiento);
-
-        if (nivelEscalamiento === 3 && !this.reporteEnviado) {
-            await this.enviarReporteProfesional(datosChat);
-        }
-    }
-
-    construirReporte(datosChat) {
-        const uid = this.obtenerUsuarioIdFormateado();
-
-        return {
-            usuario_id: uid, // 👈 Se envía limpio (entero o string válido)
-            tipo_alerta: (TAI_API_CONFIG.ESCALAMIENTO_NIVELES && TAI_API_CONFIG.ESCALAMIENTO_NIVELES[this.nivelActual]) || "CRISIS",
-            nivel_severidad: this.nivelActual,
-            timestamp: new Date().toISOString(),
-            datos_clinicos: {
-                score_crisis: datosChat.score_crisis || null,
-                triggers_detectados: datosChat.triggers_detectados || datosChat.clasificacion?.indicadores_clave || [],
-                cambios_de_comportamiento: datosChat.cambios_de_comportamiento || null
-            },
-            resumen_ia: datosChat.resumen_ia || datosChat.clasificacion?.justificacion || "El usuario muestra signos de crisis emocional crítica.",
-            contacto_emergencia: datosChat.contacto_emergencia || null,
-            historial_escalamientos: datosChat.historial_escalamientos || [],
-            recomendaciones: datosChat.recomendaciones || [],
-            profesional_id: "prof_001"
-        };
-    }
-
-    async enviarReporteProfesional(datosChat) {
-        try {
-            const payload = this.construirReporte(datosChat);
-            
-            if (!payload.usuario_id) {
-                console.error("❌ No se puede enviar el reporte: usuario_id es null o inválido.");
-                return;
+                this.usuarioId = idGuardado;
+                localStorage.setItem("usuario_id", this.usuarioId);
+                
+                this.nivelActual = 1;
+                this.reporteEnviado = false;
             }
 
-            console.log("🚨 Enviando reporte automático de crisis...", payload);
+            // Helper interno para procesar el usuario_id
+            obtenerUsuarioIdFormateado() {
+                if (!this.usuarioId) {
+                    this.usuarioId = localStorage.getItem("usuario_id") || localStorage.getItem("tai_anon_id");
+                }
+                
+                if (!this.usuarioId) {
+                    console.warn("⚠️ Atención: No se encontró un usuario_id válido en la sesión.");
+                    return null;
+                }
 
-            const respuesta = await fetch(`${TAI_API_CONFIG.BASE_URL}${TAI_API_CONFIG.ENDPOINTS.ENVIAR_REPORTE}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'ngrok-skip-browser-warning': 'true'
-                },
-                body: JSON.stringify(payload)
-            });
-
-            const resJson = await respuesta.json().catch(() => ({}));
-
-            if (respuesta.ok && (resJson.exito || resJson.reporte_guardado || resJson.success)) {
-                this.reporteEnviado = true;
-                console.log("✅ Reporte clínico enviado con éxito al panel del profesional.");
-            } else {
-                console.error("❌ Error enviando reporte:", resJson.error || resJson.mensaje || "Error en el servidor");
+                const idNumerico = Number(this.usuarioId);
+                return !isNaN(idNumerico) ? idNumerico : this.usuarioId;
             }
-        } catch (error) {
-            console.error("❌ Fallo de red al enviar reporte:", error);
+
+            async enviarMensaje(mensaje) {
+                try {
+                    const uid = this.obtenerUsuarioIdFormateado();
+                    if (!uid) {
+                        throw new Error("No hay un usuario_id activo para enviar el mensaje.");
+                    }
+
+                    const respuesta = await fetch(`${TAI_API_CONFIG.BASE_URL}${TAI_API_CONFIG.ENDPOINTS.CHAT}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'ngrok-skip-browser-warning': 'true'
+                        },
+                        body: JSON.stringify({
+                            mensaje: mensaje,
+                            usuario_id: uid
+                        })
+                    });
+
+                    const datos = await respuesta.json();
+
+                    if (respuesta.ok) {
+                        if (datos.escalamiento_activado || datos.escalamiento?.nivel_escalamiento > 1) {
+                            await this.manejarEscalamiento(datos);
+                        }
+                        return datos;
+                    } else {
+                        throw new Error(datos.error || datos.mensaje || "Error en la respuesta del servidor");
+                    }
+                } catch (error) {
+                    console.error("Error enviando mensaje:", error);
+                    throw error;
+                }
+            }
+
+            async manejarEscalamiento(datosChat) {
+                const nivelEscalamiento = datosChat.nivel_escalamiento || 
+                                         datosChat.escalamiento?.nivel_escalamiento || 
+                                         (datosChat.clasificacion && datosChat.clasificacion.nivel === "Crisis" ? 3 : 2);
+                
+                this.nivelActual = Math.max(this.nivelActual, nivelEscalamiento);
+
+                if (nivelEscalamiento === 3 && !this.reporteEnviado) {
+                    await this.enviarReporteProfesional(datosChat);
+                }
+            }
+
+            construirReporte(datosChat) {
+                const uid = this.obtenerUsuarioIdFormateado();
+
+                return {
+                    usuario_id: uid,
+                    tipo_alerta: (TAI_API_CONFIG.ESCALAMIENTO_NIVELES && TAI_API_CONFIG.ESCALAMIENTO_NIVELES[this.nivelActual]) || "CRISIS",
+                    nivel_severidad: this.nivelActual,
+                    timestamp: new Date().toISOString(),
+                    datos_clinicos: {
+                        score_crisis: datosChat.score_crisis || null,
+                        triggers_detectados: datosChat.triggers_detectados || datosChat.clasificacion?.indicadores_clave || [],
+                        cambios_de_comportamiento: datosChat.cambios_de_comportamiento || null
+                    },
+                    resumen_ia: datosChat.resumen_ia || datosChat.clasificacion?.justificacion || "El usuario muestra signos de crisis emocional crítica.",
+                    contacto_emergencia: datosChat.contacto_emergencia || null,
+                    historial_escalamientos: datosChat.historial_escalamientos || [],
+                    recomendaciones: datosChat.recomendaciones || [],
+                    profesional_id: "prof_001"
+                };
+            }
+
+            async enviarReporteProfesional(datosChat) {
+                try {
+                    const payload = this.construirReporte(datosChat);
+                    
+                    if (!payload.usuario_id) {
+                        console.error("❌ No se puede enviar el reporte: usuario_id es null o inválido.");
+                        return;
+                    }
+
+                    console.log("🚨 Enviando reporte automático de crisis...", payload);
+
+                    const respuesta = await fetch(`${TAI_API_CONFIG.BASE_URL}${TAI_API_CONFIG.ENDPOINTS.ENVIAR_REPORTE}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'ngrok-skip-browser-warning': 'true'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const resJson = await respuesta.json().catch(() => ({}));
+
+                    if (respuesta.ok && (resJson.exito || resJson.reporte_guardado || resJson.success)) {
+                        this.reporteEnviado = true;
+                        console.log("✅ Reporte clínico enviado con éxito al panel del profesional.");
+                    } else {
+                        console.error("❌ Error enviando reporte:", resJson.error || resJson.mensaje || "Error en el servidor");
+                    }
+                } catch (error) {
+                    console.error("❌ Fallo de red al enviar reporte:", error);
+                }
+            }
         }
-    }
-}
 
         // 🎨 ELEMENTOS DE LA INTERFAZ
         const chatContainer = document.getElementById("chat-container");

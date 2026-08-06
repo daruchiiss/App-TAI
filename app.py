@@ -374,6 +374,6 @@ if __name__ == "__main__":
     print(f"📂 Sirviendo templates desde: {TEMPLATES_DIR}")
     print("="*60 + "\n")
     
-    # Toma el puerto que asigna Railway dinámicamente o usa 5000 localmente
+    # Toma el puerto de Railway o usa el 5000 localmente
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=False)
