@@ -289,7 +289,7 @@
         };
 
         try {
-            const response = await fetch(`${BASE_URL}api/registro`, {
+            const response = await fetch(`${BASE_URL}/api/registro`, {
                 method: "POST",
                 headers: { 
                     "Content-Type": "application/json",
@@ -305,7 +305,7 @@
                     localStorage.setItem("usuario_id", data.usuario_id);
                 }
                 alert("¡Registro exitoso! Antes de continuar, revisa y acepta los términos.");
-                window.location.href = "legal.html";
+                window.location.href = "/legal";
             } else {
                 alert("Error al registrar: " + (data.mensaje || data.error || "Datos incorrectos."));
             }
