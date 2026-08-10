@@ -179,7 +179,7 @@
 
             </form>
 
-            <p class="login-link-text">¿Ya tienes una cuenta? <a href="login.html">Inicia sesión</a></p>
+            <p class="login-link-text">¿Ya tienes una cuenta? <a href="/login">Inicia sesión</a></p>
         </div>
 
         <!-- BARRA INFERIOR -->
@@ -300,7 +300,7 @@
 
             const data = await response.json();
 
-            if (response.ok && (data.exito || data.success)) {
+            if (response.ok && data.usuario_id)  {
                 if (data.usuario_id) {
                     localStorage.setItem("usuario_id", data.usuario_id);
                 }

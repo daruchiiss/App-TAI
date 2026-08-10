@@ -272,10 +272,11 @@
    <script>
     const urlParams = new URLSearchParams(window.location.search);
     const alertaId = urlParams.get('alerta_id');
+    
     const BACKEND_URL = window.location.hostname === "127.0.0.1" 
     ? "http://127.0.0.1:5000" 
     : window.location.origin;
-    
+
     document.addEventListener('DOMContentLoaded', () => {
         if (alertaId) {
             fetch(`${BACKEND_URL}/profesional/alerta/${alertaId}`)
@@ -322,7 +323,7 @@
         .then(data => {
             if (data.exito || data.status === "ok") {
                 alert("✓ Caso aceptado. Te has asignado como profesional a cargo.");
-                window.location.href = "dashboard_profesional.html"; // Regresa al dashboard
+                window.location.href = "/dashboard_profesional"; // Regresa al dashboard
             } else {
                 alert("✗ " + (data.mensaje || "No se pudo confirmar la acción."));
             }

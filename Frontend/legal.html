@@ -72,7 +72,7 @@
         
         <div class="container">
             <div class="legal-header">
-                <button class="btn-back" onclick="window.location.href='login.html'"><i class="fas fa-arrow-left"></i></button>
+                <button class="btn-back" onclick="window.location.href='/login'"><i class="fas fa-arrow-left"></i></button>
                 <h2>Información Legal</h2>
             </div>
 
@@ -106,12 +106,14 @@
                 <span>Acepto la <strong>Política de Privacidad</strong> y manejo de datos clínicos</span>
             </label>
 
-            <button id="btn-continuar" class="btn-primary" disabled onclick="window.location.href='personalizacion.html'">Aceptar y Continuar</button>
+            <button id="btn-continuar" class="btn-primary" disabled onclick="window.location.href='/personalizacion'">Aceptar y Continuar</button>
             <a href="#" class="download-link"><i class="fas fa-download"></i> Descargar copia</a>
         </div>
     </div>
 
     <script>
+        
+
         function validar() {
             const t = document.getElementById("chk-terminos").checked;
             const p = document.getElementById("chk-privacidad").checked;
