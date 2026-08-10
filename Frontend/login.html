@@ -263,7 +263,7 @@
         const nombre = inputNombre ? inputNombre.value.trim() : "";
         const licencia = inputLicencia ? inputLicencia.value.trim() : "";
 
-        const endpoint = isLogin ? "/login" : "/register";
+        const endpoint = isLogin ? "api/login" : "api/register";
         
         const payload = {
             email: email,
