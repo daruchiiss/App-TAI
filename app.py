@@ -80,6 +80,11 @@ def pagina_registro():
     """Página de registro"""
     return render_template("registro.html")
 
+@app.route("/registro_profesional")
+def pagina_registro_profesional():
+    """Página de registro para profesionales"""
+    return render_template("registro_profesional.html")
+
 @app.route("/dashboard-profesional")
 def dashboard_profesional():
     """Dashboard para profesionales"""
