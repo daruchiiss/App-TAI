@@ -194,6 +194,7 @@
     ? "http://127.0.0.1:5000" 
     : window.location.origin; // En Railway, usa la misma URL
     
+     let isLogin = true;  //
     // Estado inicial
 
     // 2. Selección de Rol (Paciente / Profesional)
@@ -263,7 +264,7 @@
         const nombre = inputNombre ? inputNombre.value.trim() : "";
         const licencia = inputLicencia ? inputLicencia.value.trim() : "";
 
-        const endpoint = isLogin ? "api/login" : "api/register";
+        const endpoint = isLogin ? "/api/login" : "/api/register";
         
         const payload = {
             email: email,
