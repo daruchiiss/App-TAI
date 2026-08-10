@@ -85,6 +85,18 @@ def dashboard_profesional():
     """Dashboard para profesionales"""
     return render_template("dashboard_profesional.html")
 
+@app.route("/legal")
+def pagina_legal():
+    """Página de términos y privacidad"""
+    return render_template("legal.html")
+
+
+@app.route("/personalizacion")
+def pagina_personalizacion():
+    """Página de personalización"""
+    return render_template("personalizacion.html")
+
+
 # ═══════════════════════════════════════════════════════════════
 # 📩 RUTAS DE LA API - CHAT
 # ═══════════════════════════════════════════════════════════════
