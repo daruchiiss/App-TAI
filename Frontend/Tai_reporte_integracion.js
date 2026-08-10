@@ -5,7 +5,9 @@
  */
 
 const TAI_API_CONFIG = {
-    BASE_URL: "https://overripe-barn-brunette.ngrok-free.dev",
+     BASE_URL: window.location.hostname === "127.0.0.1" 
+        ? "http://127.0.0.1:5000" 
+        : window.location.origin,
     ENDPOINTS: {
         CHAT: "/chat",
         SEND_REPORT: "/reportes/enviar",
