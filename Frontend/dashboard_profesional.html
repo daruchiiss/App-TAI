@@ -107,8 +107,11 @@
 
     <!-- Script Integrado Directo para evitar ERR_FILE_NOT_FOUND -->
     <script>
-    const BACKEND_URL = "http://127.0.0.1:5000"; 
-    const PROFESIONAL_ID = "prof_001";
+   const BASE_URL = window.location.hostname === "127.0.0.1" 
+    ? "http://127.0.0.1:5000" 
+    : window.location.origin; // En Railway, usa la misma URL
+
+
 
     async function consultarAlertasPendientes() {
         try {

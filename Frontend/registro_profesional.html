@@ -244,6 +244,12 @@
     </div>
 
     <script {nonce}>
+
+         const BASE_URL = window.location.hostname === "127.0.0.1" 
+        ? "http://127.0.0.1:5000" 
+        : window.location.origin;
+
+
         let pasoActual = 1;
 
         // Títulos de cabecera por paso

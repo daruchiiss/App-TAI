@@ -190,8 +190,11 @@
 
     <<script>
     // 1. Configuración global
-    const BASE_URL = "http://127.0.0.1:5000"; // URL de tu servidor Flask
-    let isLogin = true; // Estado inicial
+    const BASE_URL = window.location.hostname === "127.0.0.1" 
+    ? "http://127.0.0.1:5000" 
+    : window.location.origin; // En Railway, usa la misma URL
+    
+    // Estado inicial
 
     // 2. Selección de Rol (Paciente / Profesional)
     function setRole(role) {

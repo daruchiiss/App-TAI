@@ -194,7 +194,9 @@
     <script>
     // 1. Configuración de conexión
     // ⚠️ Si usas Ngrok, cambia esta variable por tu URL de Ngrok (ej: "https://xxxx.ngrok-free.dev")
-    const BASE_URL = "http://127.0.0.1:5000";
+    const BASE_URL = window.location.hostname === "127.0.0.1" 
+    ? "http://127.0.0.1:5000" 
+    : window.location.origin;
 
     // 2. Transición entre pasos del formulario
     function irAlPaso(pasoDestino) {
